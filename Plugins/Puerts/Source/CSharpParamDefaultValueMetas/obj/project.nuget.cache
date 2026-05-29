@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "qTSDsARpTC3EXA+XBx72eNNsZxTl6hM1FFetQZmObuTueDLIAweFs4/ZO9No+v3KN3zmOscaTr/8AvjY84j55A==",
+  "success": true,
+  "projectFilePath": "K:\\UE5.6.1_projects\\PuerTTS-5.3\\PTGAS\\Plugins\\Puerts\\Source\\CSharpParamDefaultValueMetas\\CSharpParamDefaultValueMetas.ubtplugin.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Li\\.nuget\\packages\\microsoft.csharp\\4.7.0\\microsoft.csharp.4.7.0.nupkg.sha512"
+  ],
+  "logs": []
+}

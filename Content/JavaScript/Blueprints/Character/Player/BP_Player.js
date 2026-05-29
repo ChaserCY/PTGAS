@@ -1,0 +1,90 @@
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.BP_Player = void 0;
+const mixin_1 = require("../../../mixin");
+const BP_BaseCharacter_1 = require("../BP_BaseCharacter");
+const UE = require("ue");
+//继承自父类蓝图，导入父类ts
+const AssetPath = "/Game/BluePrints/Character/Player/BP_Player.BP_Player_C";
+//const IMC_Default = UE.Object.Load("/Game/BluePrints/Input/IMC_Default.IMC_Default") as UE.InputMappingContext;
+const IMC_Default = UE.InputMappingContext.Load("/Game/BluePrints/Input/IMC_Default.IMC_Default");
+let BP_Player = class BP_Player extends BP_BaseCharacter_1.BP_BaseCharacter {
+    constructor() {
+        super(...arguments);
+        //相机开始位置
+        this.CameraStartLocation = new UE.Vector;
+        //相机结束位置
+        this.CameraEndLocation = new UE.Vector(0, 0, 180);
+        //相机开始的旋转
+        this.CameraStartRotation = new UE.Rotator;
+        //相机结束的旋转
+        this.CameraEndRotation = new UE.Rotator(-17, 0, 0);
+    }
+    ReceiveBeginPlay() {
+        super.ReceiveBeginPlay();
+        this.BP_PlayerController = UE.GameplayStatics.GetPlayerController(this, 0);
+        this.AddMappingContext();
+        this.LookCameraLine.SetPlayRate(1 / 0.3);
+    }
+    //添加输入映射
+    AddMappingContext() {
+        if (this.BP_PlayerController) {
+            let EnhanceInputSubsystem = UE.SubsystemBlueprintLibrary.GetLocalPlayerSubSystemFromPlayerController(this.BP_PlayerController, UE.EnhancedInputLocalPlayerSubsystem.StaticClass());
+            //as 可以强制告诉let声明变量的类型
+            if (EnhanceInputSubsystem && IMC_Default) {
+                EnhanceInputSubsystem.AddMappingContext(IMC_Default, 0);
+            }
+            //限制相机控制的俯仰角度
+            UE.GameplayStatics.GetPlayerCameraManager(this, 0).ViewPitchMin = -65;
+            UE.GameplayStatics.GetPlayerCameraManager(this, 0).ViewPitchMax = 25;
+        }
+    }
+    //鼠标移动视角
+    Look(ActionValue) {
+        this.AddControllerYawInput(ActionValue.X);
+        this.AddControllerPitchInput(ActionValue.Y);
+    }
+    //移动
+    Move(ActionValue) {
+        //前进
+        const ForwardVector = UE.KismetMathLibrary.GetForwardVector(new UE.Rotator(0, this.GetControlRotation().Yaw, 0));
+        const RightVector = UE.KismetMathLibrary.GetRightVector(new UE.Rotator(0, this.GetControlRotation().Yaw, 0));
+        this.AddMovementInput(ForwardVector, ActionValue.Y);
+        this.AddMovementInput(RightVector, ActionValue.X);
+    }
+    //锁定还需要改类图视图中组件的设置(代码实现)
+    //锁定镜头
+    LookCamera(OpenLook) {
+        //每次执行都按照参数绑定，不需要判断当前状态
+        this.bUseControllerRotationYaw = OpenLook;
+        this.SpringArm.bUsePawnControlRotation = !OpenLook;
+        this.CharacterMovement.bOrientRotationToMovement = !OpenLook;
+        if (OpenLook) {
+            this.CameraStartLocation = this.Camera.RelativeLocation;
+            this.CameraStartRotation = this.Camera.RelativeRotation;
+            this.LookCameraLine.PlayFromStart();
+        }
+        else {
+            this.CameraStartLocation = UE.Vector.ZeroVector;
+            this.CameraStartRotation = UE.Rotator.ZeroRotator;
+            this.LookCameraLine.ReverseFromEnd();
+        }
+    }
+    //镜头缓动,千万不要打错字
+    LookCameraLine__UpdateFunc() {
+        const NewLocation = UE.KismetMathLibrary.VLerp(this.CameraStartLocation, new UE.Vector(0, 0, 180), this.LookCameraLine_Time_E2604BD340D43B16DB00B9849B380DCE);
+        const NewRotation = UE.KismetMathLibrary.RLerp(this.CameraStartRotation, new UE.Rotator(-17, 0, 0), this.LookCameraLine_Time_E2604BD340D43B16DB00B9849B380DCE, true);
+        this.Camera.K2_SetRelativeLocationAndRotation(NewLocation, NewRotation, false, null, false);
+    }
+};
+BP_Player = __decorate([
+    (0, mixin_1.default)(AssetPath)
+], BP_Player);
+exports.BP_Player = BP_Player;
+//# sourceMappingURL=BP_Player.js.map
