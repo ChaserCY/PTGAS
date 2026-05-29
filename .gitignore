@@ -74,10 +74,8 @@ Plugins/*/Intermediate/*
 # Cache files for the editor to use
 DerivedDataCache/*
 
- # Puerts                                                                                                                                                                                                                          
-  node_modules/                                                                                                                                                                                                                     
-  ts_file_versions_info.json                                                                                                                                                                                                        
-  Typing/                                                                                                                                                                                                                           
-                                                                                                                                                                                                                                    
-  # IDE user settings
-  *.DotSettings.user
+ 
+PTGAS.uproject.DotSettings.user
+ts_file_versions_info.json
+node_modules
+Typing
