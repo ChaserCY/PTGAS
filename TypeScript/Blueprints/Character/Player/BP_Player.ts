@@ -17,7 +17,19 @@ export interface BP_Player extends UE.Game.BluePrints.Character.Player.BP_Player
 
 @mixin(AssetPath)
 export class  BP_Player extends BP_BaseCharacter implements BP_Player {
-    
+
+    ReceiveBeginPlay(){
+        super.ReceiveBeginPlay();
+        this.BP_PlayerController = UE.GameplayStatics.GetPlayerController(this,0) as UE.Game.BluePrints.Character.Player.BP_PlayerController.BP_PlayerController_C;
+        //给蓝图中定义的变量赋值，= get player controller + cast to BP_PlayerController
+
+        this.AddMappingContext();
+        //执行自定义函数
+
+        this.LookCameraLine.SetPlayRate(1/0.3);
+        //设置时间轴的播放速度，时间轴也定义在蓝图中
+    }
+
     //相机开始位置
     CameraStartLocation = new UE.Vector;
     //相机结束位置
@@ -26,16 +38,9 @@ export class  BP_Player extends BP_BaseCharacter implements BP_Player {
     CameraStartRotation = new UE.Rotator;
     //相机结束的旋转
     CameraEndRotation = new UE.Rotator(-17, 0, 0);
-    
-    
-    ReceiveBeginPlay(){
-        super.ReceiveBeginPlay();
-        this.BP_PlayerController = UE.GameplayStatics.GetPlayerController(this,0) as UE.Game.BluePrints.Character.Player.BP_PlayerController.BP_PlayerController_C;
-        
-        this.AddMappingContext();
-        this.LookCameraLine.SetPlayRate(1/0.3);
-    }
-    
+
+    Move_Rotator: UE.Rotator;
+
     //添加输入映射
     AddMappingContext(){
         if(this.BP_PlayerController){
@@ -68,8 +73,13 @@ export class  BP_Player extends BP_BaseCharacter implements BP_Player {
     //移动
     Move(ActionValue: UE.Vector2D) {
         //前进
-        const ForwardVector = UE.KismetMathLibrary.GetForwardVector(new UE.Rotator(0,this.GetControlRotation().Yaw,0));
-        const RightVector = UE.KismetMathLibrary.GetRightVector(new UE.Rotator(0,this.GetControlRotation().Yaw,0));
+        if (!this.Move_Rotator) {
+            this.Move_Rotator = new UE.Rotator(0, 0, 0);
+        }
+        this.Move_Rotator.Yaw =this.GetControlRotation().Yaw;
+    
+        const ForwardVector = UE.KismetMathLibrary.GetForwardVector(this.Move_Rotator);
+        const RightVector = UE.KismetMathLibrary.GetRightVector(this.Move_Rotator);
         
         this.AddMovementInput(ForwardVector,ActionValue.Y);
         this.AddMovementInput(RightVector,ActionValue.X);
@@ -88,6 +98,7 @@ export class  BP_Player extends BP_BaseCharacter implements BP_Player {
             this.CameraStartLocation = this.Camera.RelativeLocation;
             this.CameraStartRotation = this.Camera.RelativeRotation;
             this.LookCameraLine.PlayFromStart();
+            //启动时间轴
             
         }
         else {

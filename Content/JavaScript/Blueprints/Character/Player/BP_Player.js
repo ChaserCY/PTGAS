@@ -29,8 +29,11 @@ let BP_Player = class BP_Player extends BP_BaseCharacter_1.BP_BaseCharacter {
     ReceiveBeginPlay() {
         super.ReceiveBeginPlay();
         this.BP_PlayerController = UE.GameplayStatics.GetPlayerController(this, 0);
+        //给蓝图中定义的变量赋值，= get player controller + cast to BP_PlayerController
         this.AddMappingContext();
+        //执行自定义函数
         this.LookCameraLine.SetPlayRate(1 / 0.3);
+        //设置时间轴的播放速度，时间轴也定义在蓝图中
     }
     //添加输入映射
     AddMappingContext() {
@@ -53,8 +56,12 @@ let BP_Player = class BP_Player extends BP_BaseCharacter_1.BP_BaseCharacter {
     //移动
     Move(ActionValue) {
         //前进
-        const ForwardVector = UE.KismetMathLibrary.GetForwardVector(new UE.Rotator(0, this.GetControlRotation().Yaw, 0));
-        const RightVector = UE.KismetMathLibrary.GetRightVector(new UE.Rotator(0, this.GetControlRotation().Yaw, 0));
+        if (!this.Move_Rotator) {
+            this.Move_Rotator = new UE.Rotator(0, 0, 0);
+        }
+        this.Move_Rotator.Yaw = this.GetControlRotation().Yaw;
+        const ForwardVector = UE.KismetMathLibrary.GetForwardVector(this.Move_Rotator);
+        const RightVector = UE.KismetMathLibrary.GetRightVector(this.Move_Rotator);
         this.AddMovementInput(ForwardVector, ActionValue.Y);
         this.AddMovementInput(RightVector, ActionValue.X);
     }
@@ -69,6 +76,7 @@ let BP_Player = class BP_Player extends BP_BaseCharacter_1.BP_BaseCharacter {
             this.CameraStartLocation = this.Camera.RelativeLocation;
             this.CameraStartRotation = this.Camera.RelativeRotation;
             this.LookCameraLine.PlayFromStart();
+            //启动时间轴
         }
         else {
             this.CameraStartLocation = UE.Vector.ZeroVector;
