@@ -28,6 +28,43 @@ void ABaseCharacter::Tick(float DeltaTime)
 void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	if (AbilitySystemComponent)
+	{
+		//监听属性变化
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(UBaseAttributeSet::GetHPAttribute()).AddUObject(this, &ABaseCharacter::OnHPAttributeChanged);
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(UBaseAttributeSet::GetMPAttribute()).AddUObject(this, &ABaseCharacter::OnMPAttributeChanged);
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(UBaseAttributeSet::GetSPAttribute()).AddUObject(this, &ABaseCharacter::OnSPAttributeChanged);
+	}
 
+}
+
+void ABaseCharacter::OnHPAttributeChanged(const FOnAttributeChangeData& Data)
+{
+	//属性值发生变化
+	if (Data.OldValue!=Data.NewValue)
+	{
+		HPChanged.Broadcast(Data.NewValue);
+	}
+	
+}
+
+void ABaseCharacter::OnMPAttributeChanged(const FOnAttributeChangeData& Data)
+{
+	//属性值发生变化
+	if (Data.OldValue!=Data.NewValue)
+	{
+		MPChanged.Broadcast(Data.NewValue);
+	}
+	
+	
+}
+
+void ABaseCharacter::OnSPAttributeChanged(const FOnAttributeChangeData& Data)
+{
+	//属性值发生变化
+	if (Data.OldValue!=Data.NewValue)
+	{
+		SPChanged.Broadcast(Data.NewValue);
+	}
 }
 
