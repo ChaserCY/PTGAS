@@ -11,7 +11,7 @@ void UBaseAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectMo
 	
 	if (Data.EvaluatedData.Attribute.GetUProperty()!=nullptr)
 	{
-		//属性名
+		//获取修改的数据属性名
 		FString AttributeName = Data.EvaluatedData.Attribute.GetUProperty()->GetName();
 		//血量限制
 		if (AttributeName == "HP")

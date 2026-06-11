@@ -7,7 +7,8 @@
 #include "GameFramework/Character.h"
 #include "BaseCharacter.generated.h"
 
-struct FOnAttributeChangedData;
+struct FGameplayAbilityInfo;
+struct FOnAttributeChangeData;
 class UAbilitySystemComponent;
 
 //监听属性变化的代理
@@ -54,5 +55,9 @@ protected:
 	UPROPERTY(BlueprintAssignable, Category="AbbilitySystem")
 	FOnAttributeChanged SPChanged;
 	void OnSPAttributeChanged(const FOnAttributeChangeData& Data);
+	
+	//获取技能信息
+	UFUNCTION(BlueprintPure, Category="AbilitySystem")
+	FGameplayAbilityInfo GetAbilityInfo(const TSubclassOf<UBaseGameplayAbility> AbilityClass, const int Lecel = 0)const;
 	
 };

@@ -1,8 +1,8 @@
 
 #include "Character/BaseCharacter.h"
-#include "Character/BaseCharacter.h"
 
 #include "AbilitySystemComponent.h"
+#include "Abilitys/BaseGameplayAbility.h"
 
 
 ABaseCharacter::ABaseCharacter()
@@ -66,5 +66,16 @@ void ABaseCharacter::OnSPAttributeChanged(const FOnAttributeChangeData& Data)
 	{
 		SPChanged.Broadcast(Data.NewValue);
 	}
+}
+
+//获取技能信息
+FGameplayAbilityInfo ABaseCharacter::GetAbilityInfo(const TSubclassOf<UBaseGameplayAbility> AbilityClass,
+	const int Lecel) const
+{
+	if (const UBaseGameplayAbility* Ability = AbilityClass->GetDefaultObject<UBaseGameplayAbility>();AbilitySystemComponent)
+	{
+		return Ability->GetAbilityInfo(Lecel);
+	}
+	return FGameplayAbilityInfo();
 }
 

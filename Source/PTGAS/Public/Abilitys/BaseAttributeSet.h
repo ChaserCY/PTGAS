@@ -56,6 +56,6 @@ public:
 	ATTRIBUTE_ACCESSORS(UBaseAttributeSet, MaxSP)
 	
 	virtual void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data) override;
-	
+	//GAS框架提供的虚函数重写，GameplayEffect修改后自动调用
 	
 };
