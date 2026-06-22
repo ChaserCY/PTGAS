@@ -33,3 +33,6 @@ GameInstance.FCall.Bind((FunctionName, Uobject) => {
 import "./Blueprints/Test/BP_Test";
 import "./Blueprints/Character/BP_BaseCharacter";
 import "./Blueprints/Character/Player/BP_Player";
+import "./Blueprints/Ability/BaseAbility/GA_BaseResponse";
+import "./Blueprints/Ability/_00Melee/GA_Melee";
+import "./Blueprints/Character/Player/BP_PlayerController";

@@ -21,4 +21,7 @@ GameInstance.FCall.Bind((FunctionName, Uobject) => {
 require("./Blueprints/Test/BP_Test");
 require("./Blueprints/Character/BP_BaseCharacter");
 require("./Blueprints/Character/Player/BP_Player");
+require("./Blueprints/Ability/BaseAbility/GA_BaseResponse");
+require("./Blueprints/Ability/_00Melee/GA_Melee");
+require("./Blueprints/Character/Player/BP_PlayerController");
 //# sourceMappingURL=MainGame.js.map
