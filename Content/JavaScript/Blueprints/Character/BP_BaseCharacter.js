@@ -34,7 +34,7 @@ let BP_BaseCharacter = class BP_BaseCharacter {
         }
     }
     //激活技能
-    ActivateAvility(AbilityTay) {
+    ActivateAbility(AbilityTay) {
         this.AbilitySystemComponent.TryActivateAbilitiesByTag(this.GetAbilityTag(AbilityTay));
     }
     //获取技能标签

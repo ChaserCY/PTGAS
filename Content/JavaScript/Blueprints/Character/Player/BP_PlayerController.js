@@ -22,7 +22,8 @@ class BP_PlayerController {
     //普通攻击(重写编辑器里的同名函数)
     Melee() {
         if (this.BP_Player) {
-            this.BP_Player.ActivateAvility(MeleeTag);
+            this.BP_Player.ActivateAbility(MeleeTag);
+            //对应BP_BaseCharacter.ts里的ActivateAbility方法，传入一个GameplayTag参数
         }
     }
 };
