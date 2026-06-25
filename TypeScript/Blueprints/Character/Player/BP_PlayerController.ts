@@ -2,9 +2,6 @@
 import mixin from "../../../mixin";
 import {BP_BaseCharacter} from "../BP_BaseCharacter";
 
-//如果该蓝图继承自别的蓝图，还需要导入对应ts模块
-//import {xxxx} from "../xxxx";
-
 const AssetPath = "/Game/BluePrints/Character/Player/BP_PlayerController.BP_PlayerController_C";
 
 const MeleeTag = new UE.GameplayTag("Ability.Melee");
@@ -13,7 +10,6 @@ export interface BP_PlayerController extends UE.Game.BluePrints.Character.Player
 }
 
 @mixin(AssetPath)
-//有继承：export class BP_PlayerController extends xxxx implements BP_PlayerController { }
 export class BP_PlayerController implements BP_PlayerController {
     //玩家
     BP_Player : BP_BaseCharacter;
@@ -29,6 +25,4 @@ export class BP_PlayerController implements BP_PlayerController {
             //对应BP_BaseCharacter.ts里的ActivateAbility方法，传入一个GameplayTag参数
         }
     }
-
-
 }

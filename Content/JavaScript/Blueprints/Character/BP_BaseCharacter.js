@@ -10,9 +10,12 @@ exports.BP_BaseCharacter = void 0;
 const UE = require("ue");
 const mixin_1 = require("../../mixin");
 const AssetPath = "/Game/BluePrints/Character/BP_BaseCharacter.BP_BaseCharacter_C";
+//导入被动回复的GA蓝图文件
 const GA_BaseResponseClass = UE.Class.Load("/Game/BluePrints/Ability/BaseAbility/GA_BaseResponse.GA_BaseResponse_C");
-//导入蓝图文件
+//导入普通攻击的GA蓝图文件
 const GA_MeleeClass = UE.Class.Load("/Game/BluePrints/Ability/_00Melee/GA_Melee.GA_Melee_C");
+//命中标签
+const MeleeHitTag = new UE.GameplayTag("Ability.Melee.HitEvent");
 let BP_BaseCharacter = class BP_BaseCharacter {
     ReceiveBeginPlay() {
         this.InitAbility();
@@ -48,18 +51,42 @@ let BP_BaseCharacter = class BP_BaseCharacter {
         //   - (...args) => this.HPChangedEvent(...args)：箭头函数，将所有参数透传给 HPChangedEvent 方法
         this.MPChanged.Add((...args) => this.MPChangedEvent(...args));
         this.SPChanged.Add((...args) => this.SPChangedEvent(...args));
+        this.DamageBox.OnComponentBeginOverlap.Add((...args) => this.WeaponOverlop(...args));
+    }
+    WeaponOverlop(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult) {
+        if (this == OtherActor)
+            return;
+        if (!this.HitActor.Contains(OtherActor)) {
+            this.HitActor.Add(OtherActor);
+            //这个数组存起来，保证每次平A只会命中一次
+            UE.KismetSystemLibrary.PrintString(this, `${this.GetName()}击中了->${OtherActor.GetName()}`, true, true, UE.LinearColor.Green, 5.0);
+            const GameplayEventData = new UE.GameplayEventData();
+            GameplayEventData.EventTag = MeleeHitTag;
+            GameplayEventData.Instigator = this;
+            GameplayEventData.Target = OtherActor;
+            UE.AbilitySystemBlueprintLibrary.SendGameplayEventToActor(this, MeleeHitTag, GameplayEventData);
+        }
+    }
+    //开始伤害(蒙太奇通知)
+    BeginDamage() {
+        this.HitActor.Empty();
+        this.DamageBox.SetCollisionEnabled(UE.ECollisionEnabled.QueryOnly);
+    }
+    EndDamage() {
+        this.HitActor.Empty();
+        this.DamageBox.SetCollisionEnabled(UE.ECollisionEnabled.NoCollision);
     }
     HPChangedEvent(Value) {
-        UE.KismetSystemLibrary.PrintString(this, Value.toString(), true, true, UE.LinearColor.Green);
+        // UE.KismetSystemLibrary.PrintString(this, Value.toString(),true,true,UE.LinearColor.Green);
         // - 当 HP 变化时被调用，Value 是新的 HP 值
         //   - UE.KismetSystemLibrary.PrintString：在屏幕上打印字符串（对应蓝图中的 Print String 节点）
         //     - 参数依次是：WorldContext、字符串、是否打印到屏幕、是否打印到日志、颜色
     }
     MPChangedEvent(Value) {
-        UE.KismetSystemLibrary.PrintString(this, Value.toString(), true, true, UE.LinearColor.Green);
+        // UE.KismetSystemLibrary.PrintString(this, Value.toString(),true,true,UE.LinearColor.Green);
     }
     SPChangedEvent(Value) {
-        UE.KismetSystemLibrary.PrintString(this, Value.toString(), true, true, UE.LinearColor.Green);
+        // UE.KismetSystemLibrary.PrintString(this, Value.toString(),true,true,UE.LinearColor.Green);
     }
 };
 BP_BaseCharacter = __decorate([

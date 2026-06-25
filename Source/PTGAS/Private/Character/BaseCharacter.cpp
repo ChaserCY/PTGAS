@@ -73,6 +73,10 @@ void ABaseCharacter::OnSPAttributeChanged(const FOnAttributeChangeData& Data)
 FGameplayAbilityInfo ABaseCharacter::GetAbilityInfo(const TSubclassOf<UBaseGameplayAbility> AbilityClass,
 	const int Lecel) const
 {
+	if (AbilityClass == nullptr)
+	{
+		return FGameplayAbilityInfo();
+	}
 	if (const UBaseGameplayAbility* Ability = AbilityClass->GetDefaultObject<UBaseGameplayAbility>();AbilitySystemComponent)
 	{
 		return Ability->GetAbilityInfo(Lecel);
