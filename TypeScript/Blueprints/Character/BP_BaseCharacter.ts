@@ -110,18 +110,18 @@ export class BP_BaseCharacter implements BP_BaseCharacter {
         this.DamageBox.SetCollisionEnabled(UE.ECollisionEnabled.NoCollision);
     }
 
-    HPChangedEvent(Value:number){
+    protected HPChangedEvent(Value:number){
         // UE.KismetSystemLibrary.PrintString(this, Value.toString(),true,true,UE.LinearColor.Green);
         // - 当 HP 变化时被调用，Value 是新的 HP 值
         //   - UE.KismetSystemLibrary.PrintString：在屏幕上打印字符串（对应蓝图中的 Print String 节点）
         //     - 参数依次是：WorldContext、字符串、是否打印到屏幕、是否打印到日志、颜色
     }
-    
-    MPChangedEvent(Value:number){
+
+    protected MPChangedEvent(Value:number){
         // UE.KismetSystemLibrary.PrintString(this, Value.toString(),true,true,UE.LinearColor.Green);
     }
-    
-    SPChangedEvent(Value:number){
+
+    protected SPChangedEvent(Value:number){
         // UE.KismetSystemLibrary.PrintString(this, Value.toString(),true,true,UE.LinearColor.Green);
     }
     

@@ -24,4 +24,6 @@ require("./Blueprints/Character/Player/BP_Player");
 require("./Blueprints/Ability/BaseAbility/GA_BaseResponse");
 require("./Blueprints/Ability/_00Melee/GA_Melee");
 require("./Blueprints/Character/Player/BP_PlayerController");
+require("./Blueprints/Character/Enemy/BP_Enemy");
+require("./Blueprints/Character/Enemy/UMG/UMG_EnemyBar");
 //# sourceMappingURL=MainGame.js.map

@@ -36,3 +36,5 @@ import "./Blueprints/Character/Player/BP_Player";
 import "./Blueprints/Ability/BaseAbility/GA_BaseResponse";
 import "./Blueprints/Ability/_00Melee/GA_Melee";
 import "./Blueprints/Character/Player/BP_PlayerController";
+import "./Blueprints/Character/Enemy/BP_Enemy";
+import "./Blueprints/Character/Enemy/UMG/UMG_EnemyBar";

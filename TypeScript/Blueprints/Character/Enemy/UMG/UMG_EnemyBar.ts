@@ -14,4 +14,19 @@ export interface UMG_EnemyBar extends UE.Game.BluePrints.Character.Enemy.UMG.UMG
 @mixin(AssetPath)
 //有继承：export class UMG_EnemyBar extends xxxx implements UMG_EnemyBar { }
 export class UMG_EnemyBar implements UMG_EnemyBar {
+    //血量
+    HP:number;
+    
+    //最大血量
+    Max_HP:number;
+    
+    GetPercent():number{
+        return UE.KismetMathLibrary.FClamp(this.HP/this.Max_HP,0,1);
+    }
+    
+    Get_BarText():string{
+        return `${this.HP}/${this.Max_HP}`;
+        //给文本框的绑定函数返回显示字符串
+    }
+    
 }

@@ -17,9 +17,13 @@ export interface BP_Player extends UE.Game.BluePrints.Character.Player.BP_Player
 
 @mixin(AssetPath)
 export class  BP_Player extends BP_BaseCharacter implements BP_Player {
-
+    
     ReceiveBeginPlay(){
-        super.ReceiveBeginPlay();
+        // super.ReceiveBeginPlay();
+        this.InitAbility();
+        this.InitBind();
+        
+        
         this.BP_PlayerController = UE.GameplayStatics.GetPlayerController(this,0) as UE.Game.BluePrints.Character.Player.BP_PlayerController.BP_PlayerController_C;
         //给蓝图中定义的变量赋值，= get player controller + cast to BP_PlayerController
 

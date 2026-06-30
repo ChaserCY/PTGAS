@@ -55,6 +55,7 @@ export class GA_Melee implements GA_Melee {
         GameplayEvent.EventReceived.Add((...arge)=> this.HitEvent(...arge));
     
         GameplayEvent.ReadyForActivation();
+        //激活
     }
     
     //命中事件触发

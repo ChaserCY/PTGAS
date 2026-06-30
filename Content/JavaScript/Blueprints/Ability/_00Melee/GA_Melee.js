@@ -41,6 +41,7 @@ class GA_Melee {
         const GameplayEvent = UE.AbilityTask_WaitGameplayEvent.WaitGameplayEvent(this, MeleeHitTag, null, false, true);
         GameplayEvent.EventReceived.Add((...arge) => this.HitEvent(...arge));
         GameplayEvent.ReadyForActivation();
+        //激活
     }
     //命中事件触发
     HitEvent(Payload) {

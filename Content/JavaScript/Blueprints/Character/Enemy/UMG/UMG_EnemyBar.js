@@ -7,6 +7,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UMG_EnemyBar = void 0;
+const UE = require("ue");
 const mixin_1 = require("../../../../mixin");
 //需要导入mixin 模块
 //如果该蓝图继承自别的蓝图，还需要导入对应ts模块
@@ -15,6 +16,13 @@ const AssetPath = "/Game/BluePrints/Character/Enemy/UMG/UMG_EnemyBar.UMG_EnemyBa
 let UMG_EnemyBar = 
 //有继承：export class UMG_EnemyBar extends xxxx implements UMG_EnemyBar { }
 class UMG_EnemyBar {
+    GetPercent() {
+        return UE.KismetMathLibrary.FClamp(this.HP / this.Max_HP, 0, 1);
+    }
+    Get_BarText() {
+        return `${this.HP}/${this.Max_HP}`;
+        //给文本框的绑定函数返回显示字符串
+    }
 };
 UMG_EnemyBar = __decorate([
     (0, mixin_1.default)(AssetPath)
