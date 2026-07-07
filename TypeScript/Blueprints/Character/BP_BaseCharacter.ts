@@ -7,6 +7,8 @@ const AssetPath = "/Game/BluePrints/Character/BP_BaseCharacter.BP_BaseCharacter_
 
 //导入被动回复的GA蓝图文件
 const GA_BaseResponseClass = UE.Class.Load("/Game/BluePrints/Ability/BaseAbility/GA_BaseResponse.GA_BaseResponse_C");
+const BaseResponseTag = new UE.GameplayTag("Ability.BaseResponse");
+
 
 //导入普通攻击的GA蓝图文件
 const GA_MeleeClass = UE.Class.Load("/Game/BluePrints/Ability/_00Melee/GA_Melee.GA_Melee_C");
@@ -21,7 +23,17 @@ export interface BP_BaseCharacter extends UE.Game.BluePrints.Character.BP_BaseCh
 @mixin(AssetPath)
 export class BP_BaseCharacter implements BP_BaseCharacter {
     
+    //动画蓝图
+    ABP_Sinbi:UE.Game.BluePrints.Character.Animations.ABP_Sinbi.ABP_Sinbi_C = null;
+
+    
+
     ReceiveBeginPlay(){
+        this.BaseInit();
+    }
+
+    protected BaseInit(){
+        this.ABP_Sinbi = this.Mesh.GetAnimInstance() as UE.Game.BluePrints.Character.Animations.ABP_Sinbi.ABP_Sinbi_C;
         this.InitAbility();
         this.InitBind();
     }
@@ -111,10 +123,13 @@ export class BP_BaseCharacter implements BP_BaseCharacter {
     }
 
     protected HPChangedEvent(Value:number){
-        // UE.KismetSystemLibrary.PrintString(this, Value.toString(),true,true,UE.LinearColor.Green);
-        // - 当 HP 变化时被调用，Value 是新的 HP 值
-        //   - UE.KismetSystemLibrary.PrintString：在屏幕上打印字符串（对应蓝图中的 Print String 节点）
-        //     - 参数依次是：WorldContext、字符串、是否打印到屏幕、是否打印到日志、颜色
+        if(Value <= 0 && !this.Dead){
+            this.Dead = true;
+            this.ABP_Sinbi.Dead = true;//设置动画蓝图的死亡状态
+            //移除被动回复效果
+            this.AbilitySystemComponent.RemoveActiveEffectsWithTags(this.GetAbilityTag(BaseResponseTag));
+            this.CapsuleComponent.SetCollisionEnabled(UE.ECollisionEnabled.NoCollision);
+        }
     }
 
     protected MPChangedEvent(Value:number){

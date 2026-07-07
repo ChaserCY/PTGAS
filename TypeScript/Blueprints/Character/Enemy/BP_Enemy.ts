@@ -23,8 +23,7 @@ export class BP_Enemy extends BP_BaseCharacter implements BP_Enemy {
 
     ReceiveBeginPlay(){
         // super.ReceiveBeginPlay();
-        this.InitAbility();
-        this.InitBind();
+        this.BaseInit();
 
         this.UMG_Bar = this.Bar.GetUserWidgetObject() as UMG_EnemyBar;
         this.SetBarValue();
@@ -34,8 +33,9 @@ export class BP_Enemy extends BP_BaseCharacter implements BP_Enemy {
 
         // 用 setInterval 代替 Tick
         this._rotationIntervalId = setInterval(() => {
-            this.SetBarRotation();
+            this.SelfTick();
         }, 50);
+        //50ms执行一次
 
     }
     
@@ -43,6 +43,15 @@ export class BP_Enemy extends BP_BaseCharacter implements BP_Enemy {
  protected HPChangedEvent(Value: number) {
      super.HPChangedEvent(Value);
      this.SetBarValue();
+     if(this.Dead){
+         if(this.Bar){
+             this.Bar.K2_DestroyComponent(this);
+         }
+         if(this._rotationIntervalId!==null){
+             clearInterval(this._rotationIntervalId);
+             this._rotationIntervalId = null;
+         }
+     }
  }
 
 //ReceiveTick(DeltaSeconds: number) {
@@ -69,6 +78,13 @@ export class BP_Enemy extends BP_BaseCharacter implements BP_Enemy {
         }
     }
 
+    SelfTick(){
+        if(!this.Dead){
+            this.SetBarRotation();
+        }
+       
+    }
+    
     
     SetBarRotation(){
         const CameraRotation = UE.GameplayStatics.GetPlayerCameraManager(this,0).K2_GetActorRotation();

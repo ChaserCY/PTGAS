@@ -28,8 +28,7 @@ let BP_Player = class BP_Player extends BP_BaseCharacter_1.BP_BaseCharacter {
     }
     ReceiveBeginPlay() {
         // super.ReceiveBeginPlay();
-        this.InitAbility();
-        this.InitBind();
+        this.BaseInit();
         this.BP_PlayerController = UE.GameplayStatics.GetPlayerController(this, 0);
         //给蓝图中定义的变量赋值，= get player controller + cast to BP_PlayerController
         this.AddMappingContext();

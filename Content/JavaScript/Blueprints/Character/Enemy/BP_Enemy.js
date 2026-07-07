@@ -23,21 +23,30 @@ let BP_Enemy = class BP_Enemy extends BP_BaseCharacter_1.BP_BaseCharacter {
     }
     ReceiveBeginPlay() {
         // super.ReceiveBeginPlay();
-        this.InitAbility();
-        this.InitBind();
+        this.BaseInit();
         this.UMG_Bar = this.Bar.GetUserWidgetObject();
         this.SetBarValue();
         // 在 BeginPlay 中初始化，不能放类字段初始化器里（mixin 模式下不会执行）
         this.NewRotation = new UE.Rotator();
         // 用 setInterval 代替 Tick
         this._rotationIntervalId = setInterval(() => {
-            this.SetBarRotation();
+            this.SelfTick();
         }, 50);
+        //50ms执行一次
     }
     //监听血量变化
     HPChangedEvent(Value) {
         super.HPChangedEvent(Value);
         this.SetBarValue();
+        if (this.Dead) {
+            if (this.Bar) {
+                this.Bar.K2_DestroyComponent(this);
+            }
+            if (this._rotationIntervalId !== null) {
+                clearInterval(this._rotationIntervalId);
+                this._rotationIntervalId = null;
+            }
+        }
     }
     //ReceiveTick(DeltaSeconds: number) {
     //super.ReceiveTick(DeltaSeconds);这段导致了崩溃
@@ -48,6 +57,11 @@ let BP_Enemy = class BP_Enemy extends BP_BaseCharacter_1.BP_BaseCharacter {
             this.UMG_Bar.HP = UE.AbilitySystemBlueprintLibrary.GetFloatAttributeFromAbilitySystemComponent(this.AbilitySystemComponent, AttributeSetHP, this.bSuccess);
             this.UMG_Bar.Max_HP = UE.AbilitySystemBlueprintLibrary.GetFloatAttributeFromAbilitySystemComponent(this.AbilitySystemComponent, AttributeSetMaxHP, this.bSuccess);
             console.log(this.UMG_Bar.HP, this.UMG_Bar.Max_HP);
+        }
+    }
+    SelfTick() {
+        if (!this.Dead) {
+            this.SetBarRotation();
         }
     }
     SetBarRotation() {

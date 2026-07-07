@@ -20,8 +20,7 @@ export class  BP_Player extends BP_BaseCharacter implements BP_Player {
     
     ReceiveBeginPlay(){
         // super.ReceiveBeginPlay();
-        this.InitAbility();
-        this.InitBind();
+        this.BaseInit();
         
         
         this.BP_PlayerController = UE.GameplayStatics.GetPlayerController(this,0) as UE.Game.BluePrints.Character.Player.BP_PlayerController.BP_PlayerController_C;
