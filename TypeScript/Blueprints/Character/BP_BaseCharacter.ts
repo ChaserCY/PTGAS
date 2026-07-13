@@ -58,6 +58,7 @@ export class BP_BaseCharacter implements BP_BaseCharacter {
     
     //激活技能
     ActivateAbility(AbilityTay:UE.GameplayTag){
+        if(this.Dead) return;
         this.AbilitySystemComponent.TryActivateAbilitiesByTag(this.GetAbilityTag(AbilityTay));
         
     }

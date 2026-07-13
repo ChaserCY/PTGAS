@@ -17,6 +17,7 @@ const IMC_Default = UE.InputMappingContext.Load("/Game/BluePrints/Input/IMC_Defa
 let BP_Player = class BP_Player extends BP_BaseCharacter_1.BP_BaseCharacter {
     constructor() {
         super(...arguments);
+        //一定要删除蓝图中对应变量
         //相机开始位置
         this.CameraStartLocation = new UE.Vector;
         //相机结束位置
@@ -90,6 +91,14 @@ let BP_Player = class BP_Player extends BP_BaseCharacter_1.BP_BaseCharacter {
         const NewLocation = UE.KismetMathLibrary.VLerp(this.CameraStartLocation, new UE.Vector(0, 0, 180), this.LookCameraLine_Time_E2604BD340D43B16DB00B9849B380DCE);
         const NewRotation = UE.KismetMathLibrary.RLerp(this.CameraStartRotation, new UE.Rotator(-17, 0, 0), this.LookCameraLine_Time_E2604BD340D43B16DB00B9849B380DCE, true);
         this.Camera.K2_SetRelativeLocationAndRotation(NewLocation, NewRotation, false, null, false);
+    }
+    HPChangedEvent(Value) {
+        super.HPChangedEvent(Value);
+        //玩家死亡时
+        if (this.Dead) {
+            //禁用输入
+            this.DisableInput(this.BP_PlayerController);
+        }
     }
 };
 BP_Player = __decorate([

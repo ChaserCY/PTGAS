@@ -26,4 +26,7 @@ require("./Blueprints/Ability/_00Melee/GA_Melee");
 require("./Blueprints/Character/Player/BP_PlayerController");
 require("./Blueprints/Character/Enemy/BP_Enemy");
 require("./Blueprints/Character/Enemy/UMG/UMG_EnemyBar");
+require("./Blueprints/Character/Enemy/BP_AIController");
+require("./Blueprints/Character/Enemy/AI/BTT_MeleeAttack");
+require("./Blueprints/Character/Enemy/AI/BTT_FindPlayer");
 //# sourceMappingURL=MainGame.js.map

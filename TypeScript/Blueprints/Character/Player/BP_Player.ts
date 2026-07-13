@@ -17,6 +17,19 @@ export interface BP_Player extends UE.Game.BluePrints.Character.Player.BP_Player
 
 @mixin(AssetPath)
 export class  BP_Player extends BP_BaseCharacter implements BP_Player {
+
+    //玩家控制器
+    BP_PlayerController: UE.Game.BluePrints.Character.Player.BP_PlayerController.BP_PlayerController_C;
+    //一定要删除蓝图中对应变量
+    
+    //相机开始位置
+    CameraStartLocation = new UE.Vector;
+    //相机结束位置
+    CameraEndLocation = new UE.Vector(0, 0, 180);
+    //相机开始的旋转
+    CameraStartRotation = new UE.Rotator;
+    //相机结束的旋转
+    CameraEndRotation = new UE.Rotator(-17, 0, 0);
     
     ReceiveBeginPlay(){
         // super.ReceiveBeginPlay();
@@ -32,15 +45,7 @@ export class  BP_Player extends BP_BaseCharacter implements BP_Player {
         this.LookCameraLine.SetPlayRate(1/0.3);
         //设置时间轴的播放速度，时间轴也定义在蓝图中
     }
-
-    //相机开始位置
-    CameraStartLocation = new UE.Vector;
-    //相机结束位置
-    CameraEndLocation = new UE.Vector(0, 0, 180);
-    //相机开始的旋转
-    CameraStartRotation = new UE.Rotator;
-    //相机结束的旋转
-    CameraEndRotation = new UE.Rotator(-17, 0, 0);
+    
 
     Move_Rotator: UE.Rotator;
 
@@ -121,11 +126,19 @@ export class  BP_Player extends BP_BaseCharacter implements BP_Player {
         const NewRotation = UE.KismetMathLibrary.RLerp(this.CameraStartRotation, new UE.Rotator(-17,0,0), this.LookCameraLine_Time_E2604BD340D43B16DB00B9849B380DCE, true);
         
         this.Camera.K2_SetRelativeLocationAndRotation(NewLocation, NewRotation, false, null, false);
-    
-    
-    
+        
     }
     
-    
+    protected HPChangedEvent(Value: number){
+        super.HPChangedEvent(Value);
+        //玩家死亡时
+        if(this.Dead){
+           //禁用输入
+            this.DisableInput(this.BP_PlayerController);
+           
+        }
+        
+        
+    }
     
 }

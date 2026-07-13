@@ -47,6 +47,8 @@ let BP_BaseCharacter = class BP_BaseCharacter {
     }
     //激活技能
     ActivateAbility(AbilityTay) {
+        if (this.Dead)
+            return;
         this.AbilitySystemComponent.TryActivateAbilitiesByTag(this.GetAbilityTag(AbilityTay));
     }
     //获取技能标签
