@@ -9,7 +9,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.BTT_MeleeAttack = void 0;
 const UE = require("ue");
 const mixin_1 = require("../../../../mixin");
-const AssetPath = "/Game/BluePrints/Character/Enemy/AI/BTT_MeleeAttack.BTT_MeleeAttack";
+const AssetPath = "/Game/BluePrints/Character/Enemy/AI/BTT_MeleeAttack.BTT_MeleeAttack_C";
 const MeleeTag = new UE.GameplayTag("Ability.Melee");
 let BTT_MeleeAttack = class BTT_MeleeAttack {
     ReceiveExecuteAI(OwnerController, ControlledPawn) {

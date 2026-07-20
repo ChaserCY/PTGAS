@@ -10,12 +10,17 @@ exports.UMG_MainUI = void 0;
 const mixin_1 = require("../../../../mixin");
 const AssetPath = "/Game/BluePrints/Character/Player/UMG/UMG_MainUI.UMG_MainUI_C";
 let UMG_MainUI = class UMG_MainUI {
+    //AllAbilitySlot:TArray<UE.Game.BluePrints.Character.Player.UMG.UMG_AbilitySlot.UMG_AbilitySlot_C>
+    Construct() {
+    }
     OnInitialized() {
-        this.AllAbilitySlot.Add(this.AbilitySlot_1);
-        this.AllAbilitySlot.Add(this.AbilitySlot_2);
-        this.AllAbilitySlot.Add(this.AbilitySlot_3);
-        this.AllAbilitySlot.Add(this.AbilitySlot_4);
-        this.AllAbilitySlot.Add(this.AbilitySlot_5);
+    }
+    PreConstruct(IsDesignTime) {
+        this.AbilitySlots.Add(this.AbilitySlot_1);
+        this.AbilitySlots.Add(this.AbilitySlot_2);
+        this.AbilitySlots.Add(this.AbilitySlot_3);
+        this.AbilitySlots.Add(this.AbilitySlot_4);
+        this.AbilitySlots.Add(this.AbilitySlot_5);
     }
 };
 UMG_MainUI = __decorate([

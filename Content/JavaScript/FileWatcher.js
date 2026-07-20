@@ -1,5 +1,5 @@
 "use strict";
-// 监听Blueprints目录下的文件变化，并自动在MainGame.ts中添加相应的import语句
+// 监听Blueprints目录下的文件变化(运行中监听)，并自动在MainGame.ts中添加相应的import语句
 // npm install --save-dev @types/node   // 安装@types/node
 // npm install chokidar                 // 安装chokidar
 Object.defineProperty(exports, "__esModule", { value: true });

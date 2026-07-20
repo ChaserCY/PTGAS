@@ -29,4 +29,8 @@ require("./Blueprints/Character/Enemy/UMG/UMG_EnemyBar");
 require("./Blueprints/Character/Enemy/BP_AIController");
 require("./Blueprints/Character/Enemy/AI/BTT_MeleeAttack");
 require("./Blueprints/Character/Enemy/AI/BTT_FindPlayer");
+require("./Blueprints/Character/Player/UMG/UMG_AbilitySlot");
+require("./Blueprints/Character/Player/UMG/UMG_AttributeBar");
+require("./Blueprints/Character/Player/UMG/UMG_MainUI");
+require("./Blueprints/Ability/BP_GameplayAbility");
 //# sourceMappingURL=MainGame.js.map

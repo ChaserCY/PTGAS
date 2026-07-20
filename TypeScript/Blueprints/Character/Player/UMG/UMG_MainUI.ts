@@ -10,15 +10,20 @@ export interface UMG_MainUI extends UE.Game.BluePrints.Character.Player.UMG.UMG_
 @mixin(AssetPath)
 export class UMG_MainUI implements UMG_MainUI {
     
-    AllAbilitySlot:TArray<UE.Game.BluePrints.Character.Player.UMG.UMG_AbilitySlot.UMG_AbilitySlot_C>
+    //AllAbilitySlot:TArray<UE.Game.BluePrints.Character.Player.UMG.UMG_AbilitySlot.UMG_AbilitySlot_C>
     
-    OnInitialized() {
-        this.AllAbilitySlot.Add(this.AbilitySlot_1);
-        this.AllAbilitySlot.Add(this.AbilitySlot_2);
-        this.AllAbilitySlot.Add(this.AbilitySlot_3);
-        this.AllAbilitySlot.Add(this.AbilitySlot_4);
-        this.AllAbilitySlot.Add(this.AbilitySlot_5);
-        
+    Construct() {
+      
     }
 
+    OnInitialized() {
+        
+    }
+    PreConstruct(IsDesignTime: boolean) {
+        this.AbilitySlots.Add(this.AbilitySlot_1);
+        this.AbilitySlots.Add(this.AbilitySlot_2);
+        this.AbilitySlots.Add(this.AbilitySlot_3);
+        this.AbilitySlots.Add(this.AbilitySlot_4);
+        this.AbilitySlots.Add(this.AbilitySlot_5);
+    }
 }

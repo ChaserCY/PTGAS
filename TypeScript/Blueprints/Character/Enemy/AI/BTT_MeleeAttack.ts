@@ -4,7 +4,7 @@ import {$Nullable} from "puerts";
 import {BP_BaseCharacter} from "../../BP_BaseCharacter";
 
 
-const AssetPath = "/Game/BluePrints/Character/Enemy/AI/BTT_MeleeAttack.BTT_MeleeAttack";
+const AssetPath = "/Game/BluePrints/Character/Enemy/AI/BTT_MeleeAttack.BTT_MeleeAttack_C";
 
 const MeleeTag = new UE.GameplayTag("Ability.Melee");
 
@@ -23,8 +23,5 @@ export class BTT_MeleeAttack implements BTT_MeleeAttack {
             this.FinishExecute(true);
         }
         
-        
     }
-
-
 }

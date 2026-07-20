@@ -10,10 +10,13 @@ exports.BP_Player = void 0;
 const mixin_1 = require("../../../mixin");
 const BP_BaseCharacter_1 = require("../BP_BaseCharacter");
 const UE = require("ue");
-//继承自父类蓝图，导入父类ts
 const AssetPath = "/Game/BluePrints/Character/Player/BP_Player.BP_Player_C";
 //const IMC_Default = UE.Object.Load("/Game/BluePrints/Input/IMC_Default.IMC_Default") as UE.InputMappingContext;
 const IMC_Default = UE.InputMappingContext.Load("/Game/BluePrints/Input/IMC_Default.IMC_Default");
+//加载资源，注意类型
+//创建属性
+const AttributeSetHP = new UE.GameplayAttribute("HP", "/Script/PTGAS.BaseAttributeSet:HP", null);
+const AttributeSetMaxHP = new UE.GameplayAttribute("MaxHP", "/Script/PTGAS.BaseAttributeSet:MaxHP", null);
 let BP_Player = class BP_Player extends BP_BaseCharacter_1.BP_BaseCharacter {
     constructor() {
         super(...arguments);
@@ -28,10 +31,10 @@ let BP_Player = class BP_Player extends BP_BaseCharacter_1.BP_BaseCharacter {
         this.CameraEndRotation = new UE.Rotator(-17, 0, 0);
     }
     ReceiveBeginPlay() {
-        // super.ReceiveBeginPlay();
-        this.BaseInit();
         this.BP_PlayerController = UE.GameplayStatics.GetPlayerController(this, 0);
         //给蓝图中定义的变量赋值，= get player controller + cast to BP_PlayerController
+        // super.ReceiveBeginPlay();
+        this.BaseInit();
         this.AddMappingContext();
         //执行自定义函数
         this.LookCameraLine.SetPlayRate(1 / 0.3);
@@ -48,6 +51,15 @@ let BP_Player = class BP_Player extends BP_BaseCharacter_1.BP_BaseCharacter {
             //限制相机控制的俯仰角度
             UE.GameplayStatics.GetPlayerCameraManager(this, 0).ViewPitchMin = -65;
             UE.GameplayStatics.GetPlayerCameraManager(this, 0).ViewPitchMax = 25;
+        }
+    }
+    InitAbility() {
+        super.InitAbility();
+        for (let i = 0; i < this.GAS.Num(); i++) {
+            if (this.GAS.GetRef(i)) {
+                this.AbilitySystemComponent.K2_GiveAbility(this.GAS.GetRef(i));
+                this.BP_PlayerController.MainUI.AbilitySlots.GetRef(i).InitInfo(this.GetAbilityInfo(this.GAS.GetRef(i), 0));
+            }
         }
     }
     //鼠标移动视角
@@ -94,6 +106,8 @@ let BP_Player = class BP_Player extends BP_BaseCharacter_1.BP_BaseCharacter {
     }
     HPChangedEvent(Value) {
         super.HPChangedEvent(Value);
+        const Pre = Value / UE.AbilitySystemBlueprintLibrary.GetFloatAttributeFromAbilitySystemComponent(this.AbilitySystemComponent, AttributeSetMaxHP, null);
+        this.BP_PlayerController.MainUI.HPAttributeBar.SetProgress(Pre);
         //玩家死亡时
         if (this.Dead) {
             //禁用输入

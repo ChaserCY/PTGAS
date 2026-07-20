@@ -9,9 +9,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UMG_AttributeBar = void 0;
 const UE = require("ue");
 const mixin_1 = require("../../../../mixin");
-//需要导入mixin 模块
-//如果该蓝图继承自别的蓝图，还需要导入对应ts模块
-//import {xxxx} from "../xxxx";
 const AssetPath = "/Game/BluePrints/Character/Player/UMG/UMG_AttributeBar.UMG_AttributeBar_C";
 let UMG_AttributeBar = 
 //有继承：export class UMG_AttributeBar extends xxxx implements UMG_AttributeBar { }
