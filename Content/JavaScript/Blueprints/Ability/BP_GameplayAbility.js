@@ -7,6 +7,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BP_GameplayAbility = void 0;
+const UE = require("ue");
 const mixin_1 = require("../../mixin");
 //需要导入mixin 模块
 //如果该蓝图继承自别的蓝图，还需要导入对应ts模块
@@ -15,6 +16,20 @@ const AssetPath = "/Game/BluePrints/Ability/BP_GameplayAbility.BP_GameplayAbilit
 let BP_GameplayAbility = 
 //有继承：export class BP_GameplayAbility extends xxxx implements BP_GameplayAbility { }
 class BP_GameplayAbility {
+    //开始的UI的CD
+    StartUI_CD() {
+        this.PlayerController = UE.GameplayStatics.GetPlayerController(this, 0);
+        if (this.PlayerController && this.PlayerController.MainUI) {
+            const AbilitySlots = this.PlayerController.MainUI.AllAbilitySlot;
+            console.log(AbilitySlots);
+            for (let i = 0; i < AbilitySlots.Num(); i++) {
+                if (this.GetClass() == AbilitySlots.GetRef(i).AbilityClass) {
+                    AbilitySlots.GetRef(i).StartUI_CD();
+                    break;
+                }
+            }
+        }
+    }
 };
 BP_GameplayAbility = __decorate([
     (0, mixin_1.default)(AssetPath)

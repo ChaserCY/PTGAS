@@ -10,7 +10,10 @@ exports.BP_PlayerController = void 0;
 const UE = require("ue");
 const mixin_1 = require("../../../mixin");
 const AssetPath = "/Game/BluePrints/Character/Player/BP_PlayerController.BP_PlayerController_C";
+//普通攻击标签
 const MeleeTag = new UE.GameplayTag("Ability.Melee");
+//回血技能标签
+const HPRegenTag = new UE.GameplayTag("Ability.HPRegen");
 //主UI类
 const MainUIClass = UE.Class.Load("/Game/BluePrints/Character/Player/UMG/UMG_MainUI.UMG_MainUI_C");
 let BP_PlayerController = class BP_PlayerController {
@@ -26,6 +29,12 @@ let BP_PlayerController = class BP_PlayerController {
         if (this.BP_Player) {
             this.BP_Player.ActivateAbility(MeleeTag);
             //对应BP_BaseCharacter.ts里的ActivateAbility方法，传入一个GameplayTag参数
+        }
+    }
+    HPRegen() {
+        console.log("HPRegen");
+        if (this.BP_Player) {
+            this.BP_Player.ActivateAbility(HPRegenTag);
         }
     }
 };

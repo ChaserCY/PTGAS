@@ -33,4 +33,5 @@ require("./Blueprints/Character/Player/UMG/UMG_AbilitySlot");
 require("./Blueprints/Character/Player/UMG/UMG_AttributeBar");
 require("./Blueprints/Character/Player/UMG/UMG_MainUI");
 require("./Blueprints/Ability/BP_GameplayAbility");
+require("./Blueprints/Ability/_01HPRegen/GA_HPRegen");
 //# sourceMappingURL=MainGame.js.map

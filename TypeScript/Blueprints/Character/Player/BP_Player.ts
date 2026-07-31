@@ -15,6 +15,11 @@ const IMC_Default = UE.InputMappingContext.Load("/Game/BluePrints/Input/IMC_Defa
 const AttributeSetHP = new UE.GameplayAttribute("HP","/Script/PTGAS.BaseAttributeSet:HP",null);
 const AttributeSetMaxHP = new UE.GameplayAttribute("MaxHP","/Script/PTGAS.BaseAttributeSet:MaxHP",null);
 
+const AttributeSetMP = new UE.GameplayAttribute("MP","/Script/PTGAS.BaseAttributeSet:MP",null);
+const AttributeSetMaxMP = new UE.GameplayAttribute("MaxMP","/Script/PTGAS.BaseAttributeSet:MaxMP",null);
+
+const AttributeSetSP = new UE.GameplayAttribute("SP","/Script/PTGAS.BaseAttributeSet:SP",null);
+const AttributeSetMaxSP = new UE.GameplayAttribute("MaxSP","/Script/PTGAS.BaseAttributeSet:MaxSP",null);
 
 export interface BP_Player extends UE.Game.BluePrints.Character.Player.BP_Player.BP_Player_C {
 
@@ -46,7 +51,9 @@ export class  BP_Player extends BP_BaseCharacter implements BP_Player {
         this.AddMappingContext();
         //执行自定义函数
 
-        this.LookCameraLine.SetPlayRate(1/0.3);
+        if(this.LookCameraLine){
+            this.LookCameraLine.SetPlayRate(1/0.3);
+        }
         //设置时间轴的播放速度，时间轴也定义在蓝图中
     }
     
@@ -68,8 +75,11 @@ export class  BP_Player extends BP_BaseCharacter implements BP_Player {
             }
             
             //限制相机控制的俯仰角度
-            UE.GameplayStatics.GetPlayerCameraManager(this,0).ViewPitchMin = -65;
-            UE.GameplayStatics.GetPlayerCameraManager(this,0).ViewPitchMax = 25;
+            const CameraManager = UE.GameplayStatics.GetPlayerCameraManager(this,0);
+            if(CameraManager){
+                CameraManager.ViewPitchMin = -65;
+                CameraManager.ViewPitchMax = 25;
+            }
             
         }
         
@@ -80,7 +90,9 @@ export class  BP_Player extends BP_BaseCharacter implements BP_Player {
         for(let i=0;i<this.GAS.Num();i++){
             if(this.GAS.GetRef(i)){
                 this.AbilitySystemComponent.K2_GiveAbility(this.GAS.GetRef(i));
-                this.BP_PlayerController.MainUI.AbilitySlots.GetRef(i).InitInfo(this.GetAbilityInfo(this.GAS.GetRef(i),0));
+                if(this.BP_PlayerController && this.BP_PlayerController.MainUI && this.BP_PlayerController.MainUI.AbilitySlots.GetRef(i)){
+                    this.BP_PlayerController.MainUI.AbilitySlots.GetRef(i).InitInfo(this.GetAbilityInfo(this.GAS.GetRef(i),0));
+                }
             }
         }
     }
@@ -134,6 +146,7 @@ export class  BP_Player extends BP_BaseCharacter implements BP_Player {
         
     }
     
+    
     //镜头缓动,千万不要打错字
     LookCameraLine__UpdateFunc(){
         
@@ -147,18 +160,35 @@ export class  BP_Player extends BP_BaseCharacter implements BP_Player {
     
     protected HPChangedEvent(Value: number){
         super.HPChangedEvent(Value);
-        
-        const Pre = Value/UE.AbilitySystemBlueprintLibrary.GetFloatAttributeFromAbilitySystemComponent(this.AbilitySystemComponent,AttributeSetMaxHP,null);
-        this.BP_PlayerController.MainUI.HPAttributeBar.SetProgress(Pre);
-        
-        
+
+        if(this.BP_PlayerController && this.BP_PlayerController.MainUI){
+            const Pre = Value/UE.AbilitySystemBlueprintLibrary.GetFloatAttributeFromAbilitySystemComponent(this.AbilitySystemComponent,AttributeSetMaxHP,null);
+            this.BP_PlayerController.MainUI.HPAttributeBar.SetProgress(Pre);
+        }
+
         //玩家死亡时
         if(this.Dead){
            //禁用输入
             this.DisableInput(this.BP_PlayerController);
-           
         }
-        
+
     }
     
+    protected MPChangedEvent(Value: number) {
+        super.MPChangedEvent(Value);
+        if(this.BP_PlayerController && this.BP_PlayerController.MainUI){
+            const Pre = Value/UE.AbilitySystemBlueprintLibrary.GetFloatAttributeFromAbilitySystemComponent(this.AbilitySystemComponent,AttributeSetMaxMP,null);
+            this.BP_PlayerController.MainUI.MPAttributeBar.SetProgress(Pre);
+        }
+    }
+
+    protected SPChangedEvent(Value: number) {
+        super.SPChangedEvent(Value);
+        if(this.BP_PlayerController && this.BP_PlayerController.MainUI){
+            const Pre = Value/UE.AbilitySystemBlueprintLibrary.GetFloatAttributeFromAbilitySystemComponent(this.AbilitySystemComponent,AttributeSetMaxSP,null);
+            this.BP_PlayerController.MainUI.SPAttributeBar.SetProgress(Pre);
+        }
+    }
+    
+
 }
