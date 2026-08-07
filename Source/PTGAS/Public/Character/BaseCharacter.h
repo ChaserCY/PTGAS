@@ -4,10 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Abilitys/BaseAttributeSet.h"
+#include "Abilitys/BaseGameplayAbility.h"
 #include "GameFramework/Character.h"
 #include "BaseCharacter.generated.h"
 
-struct FGameplayAbilityInfo;
 struct FOnAttributeChangeData;
 class UAbilitySystemComponent;
 
@@ -42,22 +42,22 @@ protected:
 	TObjectPtr<UAbilitySystemComponent>  AbilitySystemComponent;
 	
 	//监听血量变化
-	UPROPERTY(BlueprintAssignable, Category="AbbilitySystem")
+	UPROPERTY(BlueprintAssignable, Category="AbilitySystem")
 	FOnAttributeChanged HPChanged;
 	void OnHPAttributeChanged(const FOnAttributeChangeData& Data);
 	
-	//监听血量变化
-	UPROPERTY(BlueprintAssignable, Category="AbbilitySystem")
+	//监听蓝量变化
+	UPROPERTY(BlueprintAssignable, Category="AbilitySystem")
 	FOnAttributeChanged MPChanged;
 	void OnMPAttributeChanged(const FOnAttributeChangeData& Data);
 	
-	//监听血量变化
-	UPROPERTY(BlueprintAssignable, Category="AbbilitySystem")
+	//监听能量变化
+	UPROPERTY(BlueprintAssignable, Category="AbilitySystem")
 	FOnAttributeChanged SPChanged;
 	void OnSPAttributeChanged(const FOnAttributeChangeData& Data);
 	
 	//获取技能信息
 	UFUNCTION(BlueprintPure, Category="AbilitySystem")
-	FGameplayAbilityInfo GetAbilityInfo(const TSubclassOf<UBaseGameplayAbility> AbilityClass, const int Lecel = 0)const;
+	FGameplayAbilityInfo GetAbilityInfo(const TSubclassOf<UBaseGameplayAbility> AbilityClass, const int Level = 0)const;
 	
 };

@@ -71,15 +71,15 @@ void ABaseCharacter::OnSPAttributeChanged(const FOnAttributeChangeData& Data)
 
 //获取技能信息
 FGameplayAbilityInfo ABaseCharacter::GetAbilityInfo(const TSubclassOf<UBaseGameplayAbility> AbilityClass,
-	const int Lecel) const
+	const int Level) const
 {
 	if (AbilityClass == nullptr)
 	{
 		return FGameplayAbilityInfo();
 	}
-	if (const UBaseGameplayAbility* Ability = AbilityClass->GetDefaultObject<UBaseGameplayAbility>();AbilitySystemComponent)
+	if (const UBaseGameplayAbility* Ability = AbilityClass->GetDefaultObject<UBaseGameplayAbility>();AbilitySystemComponent && Ability)
 	{
-		return Ability->GetAbilityInfo(Lecel);
+		return Ability->GetAbilityInfo(Level);
 	}
 	return FGameplayAbilityInfo();
 }

@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(echo:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(cmd.exe:*)",
+      "Bash(cd:*)"
     ]
   }
 }

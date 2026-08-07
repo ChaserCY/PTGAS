@@ -46,3 +46,4 @@ import "./Blueprints/Character/Player/UMG/UMG_AttributeBar";
 import "./Blueprints/Character/Player/UMG/UMG_MainUI";
 import "./Blueprints/Ability/BP_GameplayAbility";
 import "./Blueprints/Ability/_01HPRegen/GA_HPRegen";
+import "./Blueprints/Ability/_01HPRegen/GC_HPRegen";

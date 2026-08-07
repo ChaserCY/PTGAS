@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls:*)",
+      "Bash(cd K:/UE5.6.1_projects/PuerTTS-5.3/PTGAS && git lfs version 2>&1)",
+      "Bash(find:*)",
+      "Bash(head:*)",
+      "Bash(test:*)"
+    ]
+  }
+}

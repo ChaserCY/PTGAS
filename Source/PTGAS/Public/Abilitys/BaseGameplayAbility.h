@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbility.h"
+#include "Materials/MaterialInstance.h"
 #include "BaseGameplayAbility.generated.h"
 
 //技能消耗类型
