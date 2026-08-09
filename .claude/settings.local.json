@@ -4,7 +4,9 @@
       "Bash(echo:*)",
       "Bash(ls:*)",
       "Bash(cmd.exe:*)",
-      "Bash(cd:*)"
+      "Bash(cd:*)",
+      "Bash(head:*)",
+      "mcp__ide__getDiagnostics"
     ]
   }
 }

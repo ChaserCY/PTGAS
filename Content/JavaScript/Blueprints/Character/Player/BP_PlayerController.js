@@ -9,7 +9,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.BP_PlayerController = void 0;
 const UE = require("ue");
 const mixin_1 = require("../../../mixin");
-const AssetPath = "/Game/BluePrints/Character/Player/BP_PlayerController.BP_PlayerController_C";
+// 直接注入 C++ ABasePlayerController 类
+const BasePlayerControllerPath = "/Script/PTGAS.BasePlayerController";
 //普通攻击标签
 const MeleeTag = new UE.GameplayTag("Ability.Melee");
 //回血技能标签
@@ -24,7 +25,7 @@ let BP_PlayerController = class BP_PlayerController {
             this.MainUI.AddToViewport();
         }
     }
-    //普通攻击(重写编辑器里的同名函数)
+    //普通攻击(重写 C++ 里的 BlueprintNativeEvent)
     Melee() {
         if (this.BP_Player) {
             this.BP_Player.ActivateAbility(MeleeTag);
@@ -39,7 +40,7 @@ let BP_PlayerController = class BP_PlayerController {
     }
 };
 BP_PlayerController = __decorate([
-    (0, mixin_1.default)(AssetPath)
+    (0, mixin_1.default)(BasePlayerControllerPath)
 ], BP_PlayerController);
 exports.BP_PlayerController = BP_PlayerController;
 //# sourceMappingURL=BP_PlayerController.js.map
