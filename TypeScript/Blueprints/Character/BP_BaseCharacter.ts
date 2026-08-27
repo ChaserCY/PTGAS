@@ -39,7 +39,7 @@ export class BP_BaseCharacter implements BP_BaseCharacter {
     }
     
     //初始化技能
-    InitAbility(){
+    protected InitAbility(){
         if(GA_BaseResponseClass){
             this.AbilitySystemComponent.K2_GiveAbilityAndActivateOnce(GA_BaseResponseClass);
             //调用蓝图对象的ASC组件的"GiveAbilityAndActivateOnce"节点

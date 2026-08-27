@@ -14,3 +14,8 @@ void ABasePlayerController::HPRegen_Implementation()
 	// 这里可以留空，或者写 C++ 的默认回血逻辑
 	//UE_LOG(LogTemp, Warning, TEXT("C++ Default HPRegen Executed"));
 }
+
+void ABasePlayerController::TestAction_Implementation()
+{
+	
+}

@@ -21,4 +21,6 @@ public:
 	UFUNCTION(BlueprintCallable,BlueprintNativeEvent,Category = "TSLogic")
 	void HPRegen();
 	
+	UFUNCTION(BlueprintCallable,BlueprintNativeEvent,Category = "TSLogic")
+	void TestAction();
 };

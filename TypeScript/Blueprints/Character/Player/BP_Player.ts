@@ -7,9 +7,15 @@ import {BP_PlayerController} from "./BP_PlayerController";
 
 const AssetPath = "/Game/BluePrints/Character/Player/BP_Player.BP_Player_C";
 
-//const IMC_Default = UE.Object.Load("/Game/BluePrints/Input/IMC_Default.IMC_Default") as UE.InputMappingContext;
+const JumpAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_Jump.IA_Jump")
+const MoveAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_Move.IA_Move")
+const LookAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_Look.IA_Look")
+//锁定相机
+const LockCameraAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_LockCamera.IA_LockCamera")
+
+
+//const IMC_Default = UE.Object.Load("/Game/BluePrints/Input/IMC_Default.IMC_Default") as UE.InputMappingContext;//加载资源，注意类型
 const IMC_Default = UE.InputMappingContext.Load("/Game/BluePrints/Input/IMC_Default.IMC_Default");
-//加载资源，注意类型
 
 //创建属性
 const AttributeSetHP = new UE.GameplayAttribute("HP","/Script/PTGAS.BaseAttributeSet:HP",null);
@@ -28,9 +34,8 @@ export interface BP_Player extends UE.Game.BluePrints.Character.Player.BP_Player
 @mixin(AssetPath)
 export class  BP_Player extends BP_BaseCharacter implements BP_Player {
 
-    //玩家控制器
-    BP_PlayerController: BP_PlayerController;
-    //一定要删除蓝图中对应变量
+    //玩家控制器,一定要删除蓝图中对应变量
+    PlayerController: BP_PlayerController;
     
     //相机开始位置
     CameraStartLocation = new UE.Vector;
@@ -41,20 +46,23 @@ export class  BP_Player extends BP_BaseCharacter implements BP_Player {
     //相机结束的旋转
     CameraEndRotation = new UE.Rotator(-17, 0, 0);
     
+    InLock:boolean = false;
+    
     ReceiveBeginPlay(){
-        this.BP_PlayerController = UE.GameplayStatics.GetPlayerController(this,0) as BP_PlayerController;
+        this.PlayerController = UE.GameplayStatics.GetPlayerController(this,0) as BP_PlayerController;
         //给蓝图中定义的变量赋值，= get player controller + cast to BP_PlayerController
         
         // super.ReceiveBeginPlay();
         this.BaseInit();
-
-        this.AddMappingContext();
+        
         //执行自定义函数
+        this.AddMappingContext();
 
+        //设置时间轴的播放速度，时间轴也定义在蓝图中
         if(this.LookCameraLine){
             this.LookCameraLine.SetPlayRate(1/0.3);
         }
-        //设置时间轴的播放速度，时间轴也定义在蓝图中
+        
     }
     
 
@@ -62,10 +70,10 @@ export class  BP_Player extends BP_BaseCharacter implements BP_Player {
 
     //添加输入映射
     AddMappingContext(){
-        if(this.BP_PlayerController){
+        if(this.PlayerController){
             
             let EnhanceInputSubsystem = UE.SubsystemBlueprintLibrary.GetLocalPlayerSubSystemFromPlayerController(
-                this.BP_PlayerController,
+                this.PlayerController,
                 UE.EnhancedInputLocalPlayerSubsystem.StaticClass()
             )as UE.EnhancedInputLocalPlayerSubsystem;
             //as 可以强制告诉let声明变量的类型
@@ -81,34 +89,57 @@ export class  BP_Player extends BP_BaseCharacter implements BP_Player {
                 CameraManager.ViewPitchMax = 25;
             }
             
+            this.BindKey();
+        }
+        
+    }
+
+    //绑定按键
+    BindKey(){
+        const InputComponent = this.GetComponentByClass(UE.EnhancedInputComponent.StaticClass()) as UE.EnhancedInputComponent;
+        if(InputComponent){
+            InputComponent.BindAction(JumpAction,UE.ETriggerEvent.Started,this,"Jumpp"); //这里的第一个函数必须是蓝图函数，或者C++蓝图可以调用的函数
+            InputComponent.BindAction(MoveAction,UE.ETriggerEvent.Triggered, this,"Move");
+            InputComponent.BindAction(LookAction,UE.ETriggerEvent.Triggered, this,"Look");
+            InputComponent.BindAction(LockCameraAction,UE.ETriggerEvent.Started, this,"IA_LockCamera");
         }
         
     }
     
-    InitAbility(){
+    protected InitAbility(){
         super.InitAbility();
         for(let i=0;i<this.GAS.Num();i++){
             if(this.GAS.GetRef(i)){
                 this.AbilitySystemComponent.K2_GiveAbility(this.GAS.GetRef(i));
-                if(this.BP_PlayerController && this.BP_PlayerController.MainUI && this.BP_PlayerController.MainUI.AbilitySlots.GetRef(i)){
-                    this.BP_PlayerController.MainUI.AbilitySlots.GetRef(i).InitInfo(this.GetAbilityInfo(this.GAS.GetRef(i),0));
+                if(this.PlayerController && this.PlayerController.MainUI && this.PlayerController.MainUI.AbilitySlots.GetRef(i)){
+                    this.PlayerController.MainUI.AbilitySlots.GetRef(i).InitInfo(this.GetAbilityInfo(this.GAS.GetRef(i),0));
                 }
             }
         }
     }
     
-    
-    
+    Jumpp() {
+        this.Jump();
+    }
+
+    IA_LockCamera() {
+        this.LookCamera(!this.InLock);
+        this.InLock = !this.InLock;
+    }
+
     //鼠标移动视角
-    Look(ActionValue: UE.Vector2D) {
-        this.AddControllerYawInput(ActionValue.X);
-        this.AddControllerPitchInput(ActionValue.Y);
+    Look(ActionValue: UE.InputActionValue) {
+        const Value2D = UE.EnhancedInputLibrary.Conv_InputActionValueToAxis2D(ActionValue);
+        this.AddControllerYawInput(Value2D.X);
+        this.AddControllerPitchInput(Value2D.Y);
         
     }
 
     //移动
-    Move(ActionValue: UE.Vector2D) {
+    Move(ActionValue: UE.InputActionValue) {
         //前进
+        const Value2D = UE.EnhancedInputLibrary.Conv_InputActionValueToAxis2D(ActionValue);
+        
         if (!this.Move_Rotator) {
             this.Move_Rotator = new UE.Rotator(0, 0, 0);
         }
@@ -117,8 +148,8 @@ export class  BP_Player extends BP_BaseCharacter implements BP_Player {
         const ForwardVector = UE.KismetMathLibrary.GetForwardVector(this.Move_Rotator);
         const RightVector = UE.KismetMathLibrary.GetRightVector(this.Move_Rotator);
         
-        this.AddMovementInput(ForwardVector,ActionValue.Y);
-        this.AddMovementInput(RightVector,ActionValue.X);
+        this.AddMovementInput(ForwardVector,Value2D.Y);
+        this.AddMovementInput(RightVector,Value2D.X);
         
     }
     
@@ -161,32 +192,32 @@ export class  BP_Player extends BP_BaseCharacter implements BP_Player {
     protected HPChangedEvent(Value: number){
         super.HPChangedEvent(Value);
 
-        if(this.BP_PlayerController && this.BP_PlayerController.MainUI){
+        if(this.PlayerController && this.PlayerController.MainUI){
             const Pre = Value/UE.AbilitySystemBlueprintLibrary.GetFloatAttributeFromAbilitySystemComponent(this.AbilitySystemComponent,AttributeSetMaxHP,null);
-            this.BP_PlayerController.MainUI.HPAttributeBar.SetProgress(Pre);
+            this.PlayerController.MainUI.HPAttributeBar.SetProgress(Pre);
         }
 
         //玩家死亡时
         if(this.Dead){
            //禁用输入
-            this.DisableInput(this.BP_PlayerController);
+            this.DisableInput(this.PlayerController);
         }
 
     }
     
     protected MPChangedEvent(Value: number) {
         super.MPChangedEvent(Value);
-        if(this.BP_PlayerController && this.BP_PlayerController.MainUI){
+        if(this.PlayerController && this.PlayerController.MainUI){
             const Pre = Value/UE.AbilitySystemBlueprintLibrary.GetFloatAttributeFromAbilitySystemComponent(this.AbilitySystemComponent,AttributeSetMaxMP,null);
-            this.BP_PlayerController.MainUI.MPAttributeBar.SetProgress(Pre);
+            this.PlayerController.MainUI.MPAttributeBar.SetProgress(Pre);
         }
     }
 
     protected SPChangedEvent(Value: number) {
         super.SPChangedEvent(Value);
-        if(this.BP_PlayerController && this.BP_PlayerController.MainUI){
+        if(this.PlayerController && this.PlayerController.MainUI){
             const Pre = Value/UE.AbilitySystemBlueprintLibrary.GetFloatAttributeFromAbilitySystemComponent(this.AbilitySystemComponent,AttributeSetMaxSP,null);
-            this.BP_PlayerController.MainUI.SPAttributeBar.SetProgress(Pre);
+            this.PlayerController.MainUI.SPAttributeBar.SetProgress(Pre);
         }
     }
     
