@@ -165,9 +165,14 @@ export class BP_BaseCharacter implements BP_BaseCharacter {
     SetFrictionToZero(Zero:boolean){
         if(Zero){
             this.CharacterMovement.GroundFriction = 0;
+            this.CapsuleComponent.SetCollisionResponseToChannel(UE.ECollisionChannel.ECC_Pawn, UE.ECollisionResponse.ECR_Ignore);
+            this.CapsuleComponent.SetCollisionResponseToChannel(UE.ECollisionChannel.ECC_Camera, UE.ECollisionResponse.ECR_Ignore);
         }
         else{
             this.CharacterMovement.GroundFriction = this.InitFriction;
+            this.CapsuleComponent.SetCollisionResponseToChannel(UE.ECollisionChannel.ECC_Pawn, UE.ECollisionResponse.ECR_Block);
+            this.CapsuleComponent.SetCollisionResponseToChannel(UE.ECollisionChannel.ECC_Camera, UE.ECollisionResponse.ECR_Block);
+            
         }
         
     }

@@ -17,27 +17,41 @@ let GA_Dash = class GA_Dash extends BP_GameplayAbility_1.BP_GameplayAbility {
     constructor() {
         super(...arguments);
         this.Character = new BP_BaseCharacter_1.BP_BaseCharacter;
-        /*此函数是k2_EndAbility函数的回调，执行完End后自动执行*/
-        //K2_OnEndAbility(bWasCancelled: boolean) {
-        //}
     }
     K2_ActivateAbility() {
+        /*获取所施法角色对象*/
         this.Character = this.GetAvatarActorFromActorInfo();
         this.K2_CommitAbility();
         this.StartUI_CD();
         this.PlayDashMontage();
         console.log("冲刺释放");
-        if (this.Character) {
-            this.Character.DashForward(this.Character.GetActorForwardVector(), 2000, 0.66);
-        }
+        this.DashForward();
     }
     PlayDashMontage() {
         const MontageTask = UE.AbilityTask_PlayMontageAndWait.CreatePlayMontageAndWaitProxy(this, "Dash", MA_Dash);
-        MontageTask.OnCompleted.Add(() => this.K2_EndAbility()); // 完整播放完毕
-        MontageTask.OnInterrupted.Add(() => this.K2_EndAbility()); // 被其他动画打断
-        MontageTask.OnBlendOut.Add(() => this.K2_EndAbility());
-        MontageTask.OnCancelled.Add(() => this.K2_EndAbility()); // 任务被取消
+        MontageTask.OnCompleted.Add(() => this.K2_SelfEndAbility()); // 完整播放完毕
+        MontageTask.OnInterrupted.Add(() => this.K2_SelfEndAbility()); // 被其他动画打断
+        MontageTask.OnBlendOut.Add(() => this.K2_SelfEndAbility());
+        MontageTask.OnCancelled.Add(() => this.K2_SelfEndAbility()); // 任务被取消
         MontageTask.ReadyForActivation(); // 必须调用，否则蒙太奇不会真正播放
+    }
+    /*此函数是自定义的函数，相似于下面的回调，可添加逻辑*/
+    K2_SelfEndAbility() {
+        this.K2_EndAbility();
+        if (this.Character) {
+            this.Character.SetFrictionToZero(false);
+        }
+    }
+    /*此函数是k2_EndAbility函数的回调，执行完End后自动执行*/
+    //K2_OnEndAbility(bWasCancelled: boolean) {
+    // if(this.Character){
+    //   this.Character.SetFrictionToZero(false);
+    //}
+    //}
+    DashForward() {
+        if (this.Character) {
+            this.Character.DashForward(this.Character.GetActorForwardVector(), 2000, 0.66);
+        }
     }
 };
 GA_Dash = __decorate([
