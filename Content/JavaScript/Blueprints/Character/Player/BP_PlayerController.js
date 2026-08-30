@@ -12,15 +12,18 @@ const mixin_1 = require("../../../mixin");
 // 直接注入 C++ ABasePlayerController 类
 const BasePlayerControllerPath = "/Script/PTGAS.BasePlayerController";
 // #region GameplayTag
-//普通攻击标签
+/*普通攻击标签*/
 const MeleeTag = new UE.GameplayTag("Ability.Melee");
-//回血技能标签
+/*回血技能标签*/
 const HPRegenTag = new UE.GameplayTag("Ability.HPRegen");
+/*冲刺技能标签*/
+const DashTag = new UE.GameplayTag("Ability.Dash");
 // #endregion
 // #region InputAction
 const TestAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_Test.IA_Test");
 const MeleeAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_Melee.IA_Melee");
 const HPRegenAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_HPRegen.IA_HPRegen");
+const DashAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_Dash.IA_Dash");
 // #endregion
 //主UI类
 const MainUIClass = UE.Class.Load("/Game/BluePrints/Character/Player/UMG/UMG_MainUI.UMG_MainUI_C");
@@ -40,6 +43,7 @@ let BP_PlayerController = class BP_PlayerController {
             InputComponent.BindAction(TestAction, UE.ETriggerEvent.Started, this, "TestAction"); //这里的第一个函数必须是蓝图函数，或者C++蓝图可以调用的函数
             InputComponent.BindAction(MeleeAction, UE.ETriggerEvent.Started, this, "Melee");
             InputComponent.BindAction(HPRegenAction, UE.ETriggerEvent.Started, this, "HPRegen");
+            InputComponent.BindAction(DashAction, UE.ETriggerEvent.Started, this, "Dash");
         }
     }
     // #region Skill_Function
@@ -51,6 +55,12 @@ let BP_PlayerController = class BP_PlayerController {
         if (this.BP_Player) {
             this.BP_Player.ActivateAbility(MeleeTag);
             //对应BP_BaseCharacter.ts里的ActivateAbility方法，传入一个GameplayTag参数
+        }
+    }
+    Dash() {
+        if (this.BP_Player) {
+            console.log("按下2键");
+            this.BP_Player.ActivateAbility(DashTag);
         }
     }
     HPRegen() {

@@ -26,7 +26,8 @@ export class BP_BaseCharacter implements BP_BaseCharacter {
     //动画蓝图
     ABP_Sinbi:UE.Game.BluePrints.Character.Animations.ABP_Sinbi.ABP_Sinbi_C = null;
 
-    
+    //初始化摩擦力
+    InitFriction:number = 0;
 
     ReceiveBeginPlay(){
         this.BaseInit();
@@ -36,6 +37,8 @@ export class BP_BaseCharacter implements BP_BaseCharacter {
         this.ABP_Sinbi = this.Mesh.GetAnimInstance() as UE.Game.BluePrints.Character.Animations.ABP_Sinbi.ABP_Sinbi_C;
         this.InitAbility();
         this.InitBind();
+        
+        this.InitFriction = this.CharacterMovement.GroundFriction;
     }
     
     //初始化技能
@@ -141,4 +144,31 @@ export class BP_BaseCharacter implements BP_BaseCharacter {
         // UE.KismetSystemLibrary.PrintString(this, Value.toString(),true,true,UE.LinearColor.Green);
     }
     
+    /*冲刺位移技能*/
+    DashForward(DashDirection:UE.Vector, Force:number /* = 1.000000 */, DashTime:number /* = 0.500000 */)
+    {
+        this.SetFrictionToZero(true);
+        const Impulse = new UE.Vector(
+            DashDirection.X * Force,
+            DashDirection.Y * Force,
+            DashDirection.Z * Force,
+        );
+        this.CharacterMovement.AddImpulse(Impulse, true);
+        
+        setTimeout(()=>{
+            this.SetFrictionToZero(false);
+        },DashTime*1000);//毫秒单位倒计时
+        
+    }
+    
+    /*设置摩擦力为0*/
+    SetFrictionToZero(Zero:boolean){
+        if(Zero){
+            this.CharacterMovement.GroundFriction = 0;
+        }
+        else{
+            this.CharacterMovement.GroundFriction = this.InitFriction;
+        }
+        
+    }
 }

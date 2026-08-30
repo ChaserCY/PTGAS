@@ -23,4 +23,7 @@ public:
 	
 	UFUNCTION(BlueprintCallable,BlueprintNativeEvent,Category = "TSLogic")
 	void TestAction();
+	
+	UFUNCTION(BlueprintCallable,BlueprintNativeEvent,Category = "TSLogin")
+	void Dash();
 };

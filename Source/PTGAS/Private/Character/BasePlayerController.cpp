@@ -19,3 +19,7 @@ void ABasePlayerController::TestAction_Implementation()
 {
 	
 }
+
+void ABasePlayerController::Dash_Implementation()
+{
+}

@@ -35,4 +35,5 @@ require("./Blueprints/Character/Player/UMG/UMG_MainUI");
 require("./Blueprints/Ability/BP_GameplayAbility");
 require("./Blueprints/Ability/_01HPRegen/GA_HPRegen");
 require("./Blueprints/Ability/_01HPRegen/GC_HPRegen");
+require("./Blueprints/Ability/_02Dash/GA_Dash");
 //# sourceMappingURL=MainGame.js.map
