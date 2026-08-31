@@ -162,8 +162,8 @@ export class BP_BaseCharacter implements BP_BaseCharacter {
     }
     
     /*设置摩擦力为0*/
-    SetFrictionToZero(Zero:boolean){
-        if(Zero){
+    SetFrictionToZero(isZero:boolean){
+        if(isZero){
             this.CharacterMovement.GroundFriction = 0;
             this.CapsuleComponent.SetCollisionResponseToChannel(UE.ECollisionChannel.ECC_Pawn, UE.ECollisionResponse.ECR_Ignore);
             this.CapsuleComponent.SetCollisionResponseToChannel(UE.ECollisionChannel.ECC_Camera, UE.ECollisionResponse.ECR_Ignore);
@@ -174,6 +174,12 @@ export class BP_BaseCharacter implements BP_BaseCharacter {
             this.CapsuleComponent.SetCollisionResponseToChannel(UE.ECollisionChannel.ECC_Camera, UE.ECollisionResponse.ECR_Block);
             
         }
+    }
+    
+    /*眩晕*/
+    Stun(StunDuration: number){
         
     }
+    
+    
 }

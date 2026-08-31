@@ -10,7 +10,10 @@ exports.BP_Player = void 0;
 const mixin_1 = require("../../../mixin");
 const BP_BaseCharacter_1 = require("../BP_BaseCharacter");
 const UE = require("ue");
+const ue_1 = require("ue");
 const AssetPath = "/Game/BluePrints/Character/Player/BP_Player.BP_Player_C";
+/*冲刺命中事件*/
+const DashHitTag = new ue_1.GameplayTag("Ability.Dash.HitEvent");
 const JumpAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_Jump.IA_Jump");
 const MoveAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_Move.IA_Move");
 const LookAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_Look.IA_Look");
@@ -49,6 +52,8 @@ let BP_Player = class BP_Player extends BP_BaseCharacter_1.BP_BaseCharacter {
         if (this.LookCameraLine) {
             this.LookCameraLine.SetPlayRate(1 / 0.3);
         }
+        //添加球形碰撞触发事件
+        this.Sphere.OnComponentBeginOverlap.Add((...args) => this.SphereOnOverlap(...args));
     }
     //添加输入映射
     AddMappingContext() {
@@ -138,6 +143,27 @@ let BP_Player = class BP_Player extends BP_BaseCharacter_1.BP_BaseCharacter {
         const NewLocation = UE.KismetMathLibrary.VLerp(this.CameraStartLocation, new UE.Vector(0, 0, 180), this.LookCameraLine_Time_E2604BD340D43B16DB00B9849B380DCE);
         const NewRotation = UE.KismetMathLibrary.RLerp(this.CameraStartRotation, new UE.Rotator(-17, 0, 0), this.LookCameraLine_Time_E2604BD340D43B16DB00B9849B380DCE, true);
         this.Camera.K2_SetRelativeLocationAndRotation(NewLocation, NewRotation, false, null, false);
+    }
+    //碰撞事件的回调
+    SphereOnOverlap(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult) {
+        if (OtherActor != this && !this.HitActor.Contains(OtherActor)) {
+            this.HitActor.Add(OtherActor);
+            UE.KismetSystemLibrary.PrintString(this, `${this.GetName()}击中了->${OtherActor.GetName()}`, true, true, UE.LinearColor.Green, 5.0);
+            const GameplayEventData = new UE.GameplayEventData();
+            GameplayEventData.EventTag = DashHitTag;
+            GameplayEventData.Instigator = this;
+            GameplayEventData.Target = OtherActor;
+            UE.AbilitySystemBlueprintLibrary.SendGameplayEventToActor(this, DashHitTag, GameplayEventData);
+        }
+    }
+    SetFrictionToZero(isZero) {
+        super.SetFrictionToZero(isZero);
+        /*防止摄像机杆子收缩*/
+        this.SpringArm.bDoCollisionTest = !isZero;
+        this.Sphere.SetCollisionEnabled(isZero ? UE.ECollisionEnabled.QueryOnly : UE.ECollisionEnabled.NoCollision);
+        /*第二个参数是是否更改后，立即检测*/
+        this.Sphere.SetSphereRadius(isZero ? 80 : 32, true);
+        this.HitActor.Empty();
     }
     HPChangedEvent(Value) {
         super.HPChangedEvent(Value);

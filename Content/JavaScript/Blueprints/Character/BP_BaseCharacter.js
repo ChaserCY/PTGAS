@@ -115,8 +115,8 @@ let BP_BaseCharacter = class BP_BaseCharacter {
         }, DashTime * 1000); //毫秒单位倒计时
     }
     /*设置摩擦力为0*/
-    SetFrictionToZero(Zero) {
-        if (Zero) {
+    SetFrictionToZero(isZero) {
+        if (isZero) {
             this.CharacterMovement.GroundFriction = 0;
             this.CapsuleComponent.SetCollisionResponseToChannel(UE.ECollisionChannel.ECC_Pawn, UE.ECollisionResponse.ECR_Ignore);
             this.CapsuleComponent.SetCollisionResponseToChannel(UE.ECollisionChannel.ECC_Camera, UE.ECollisionResponse.ECR_Ignore);
@@ -126,6 +126,9 @@ let BP_BaseCharacter = class BP_BaseCharacter {
             this.CapsuleComponent.SetCollisionResponseToChannel(UE.ECollisionChannel.ECC_Pawn, UE.ECollisionResponse.ECR_Block);
             this.CapsuleComponent.SetCollisionResponseToChannel(UE.ECollisionChannel.ECC_Camera, UE.ECollisionResponse.ECR_Block);
         }
+    }
+    /*眩晕*/
+    Stun(StunDuration) {
     }
 };
 BP_BaseCharacter = __decorate([

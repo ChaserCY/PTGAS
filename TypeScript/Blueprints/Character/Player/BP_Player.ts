@@ -4,15 +4,20 @@ import {BP_BaseCharacter} from "../BP_BaseCharacter";
 import * as UE from "ue";
 //继承自父类蓝图，导入父类ts
 import {BP_PlayerController} from "./BP_PlayerController";
+import {$Nullable} from "puerts";
+import {GameplayTag} from "ue";
 
 const AssetPath = "/Game/BluePrints/Character/Player/BP_Player.BP_Player_C";
+
+/*冲刺命中事件*/
+const DashHitTag = new GameplayTag("Ability.Dash.HitEvent");
 
 const JumpAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_Jump.IA_Jump")
 const MoveAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_Move.IA_Move")
 const LookAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_Look.IA_Look")
+
 //锁定相机
 const LockCameraAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_LockCamera.IA_LockCamera")
-
 
 //const IMC_Default = UE.Object.Load("/Game/BluePrints/Input/IMC_Default.IMC_Default") as UE.InputMappingContext;//加载资源，注意类型
 const IMC_Default = UE.InputMappingContext.Load("/Game/BluePrints/Input/IMC_Default.IMC_Default");
@@ -62,6 +67,9 @@ export class  BP_Player extends BP_BaseCharacter implements BP_Player {
         if(this.LookCameraLine){
             this.LookCameraLine.SetPlayRate(1/0.3);
         }
+        
+        //添加球形碰撞触发事件
+        this.Sphere.OnComponentBeginOverlap.Add((...args)=>this.SphereOnOverlap(...args));
         
     }
     
@@ -189,6 +197,37 @@ export class  BP_Player extends BP_BaseCharacter implements BP_Player {
         
     }
     
+    //碰撞事件的回调
+    SphereOnOverlap(OverlappedComponent: $Nullable<UE.PrimitiveComponent>, OtherActor: $Nullable<UE.Actor>, OtherComp: $Nullable<UE.PrimitiveComponent>, OtherBodyIndex: number, bFromSweep: boolean, SweepResult: UE.HitResult){
+        if(OtherActor != this&& !this.HitActor.Contains(OtherActor)){
+            this.HitActor.Add(OtherActor);
+            UE.KismetSystemLibrary.PrintString(
+                this,
+                `${this.GetName()}击中了->${OtherActor.GetName()}`,
+                true,
+                true,
+                UE.LinearColor.Green,
+                5.0
+            );
+
+            const GameplayEventData = new UE.GameplayEventData();
+            GameplayEventData.EventTag = DashHitTag;
+            GameplayEventData.Instigator = this;
+            GameplayEventData.Target = OtherActor;
+            UE.AbilitySystemBlueprintLibrary.SendGameplayEventToActor(this,DashHitTag,GameplayEventData);
+        }
+    }
+    
+    SetFrictionToZero(isZero: boolean) {
+        super.SetFrictionToZero(isZero);
+        /*防止摄像机杆子收缩*/
+        this.SpringArm.bDoCollisionTest = !isZero;
+        this.Sphere.SetCollisionEnabled(isZero?UE.ECollisionEnabled.QueryOnly:UE.ECollisionEnabled.NoCollision);
+        /*第二个参数是是否更改后，立即检测*/
+        this.Sphere.SetSphereRadius(isZero? 80 : 32, true);
+        this.HitActor.Empty();
+    }
+
     protected HPChangedEvent(Value: number){
         super.HPChangedEvent(Value);
 

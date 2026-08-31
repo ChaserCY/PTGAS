@@ -10,6 +10,8 @@ const AttributeSetHP = new UE.GameplayAttribute("HP","/Script/PTGAS.BaseAttribut
 const AttributeSetMaxHP = new UE.GameplayAttribute("MaxHP","/Script/PTGAS.BaseAttributeSet:MaxHP",null);
 
 
+const MA_Stun =  UE.AnimMontage.Load("/Game/BluePrints/Character/Animations/Montage/MA_Stun.MA_Stun");
+
 export interface BP_Enemy extends UE.Game.BluePrints.Character.Enemy.BP_Enemy.BP_Enemy_C {
 }
 
@@ -92,5 +94,32 @@ export class BP_Enemy extends BP_BaseCharacter implements BP_Enemy {
         this.NewRotation.Yaw = CameraRotation.Yaw + 180;
         this.NewRotation.Roll = CameraRotation.Roll * -1;
         this.Bar.K2_SetWorldRotation(this.NewRotation, false, null, false);
+    }
+    
+    //停止控制器
+    protected StopController(){
+        const AIController = UE.AIBlueprintHelperLibrary.GetAIController(this.GetController());
+        if(AIController){
+            AIController.BrainComponent.StopLogic("Stop Controller");
+        }
+    }
+    
+    protected ResumeController(){
+        const AIController = UE.AIBlueprintHelperLibrary.GetAIController(this.GetController());
+        if(AIController){
+            AIController.BrainComponent.RestartLogic();
+        }
+    }
+    
+    //眩晕
+    Stun(StunDuration: number) {
+        this.StopController();
+        
+        this.PlayAnimMontage(MA_Stun);
+        
+        setTimeout(()=>{
+            this.ResumeController();
+        },StunDuration*1000)
+        
     }
 }

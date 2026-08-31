@@ -11,8 +11,11 @@ const UE = require("ue");
 const mixin_1 = require("../../../mixin");
 const BP_GameplayAbility_1 = require("../BP_GameplayAbility");
 const BP_BaseCharacter_1 = require("../../Character/BP_BaseCharacter");
+const ue_1 = require("ue");
 const AssetPath = "/Game/BluePrints/Ability/_02Dash/GA_Dash.GA_Dash_C";
 const MA_Dash = UE.AnimMontage.Load("/Game/BluePrints/Character/Animations/Montage/MA_Dash.MA_Dash");
+const DashDamageClass = UE.Class.Load("/Game/BluePrints/Ability/_02Dash/GE_Dash_Damage.GE_Dash_Damage_C");
+const DashHitTag = new ue_1.GameplayTag("Ability.Dash.HitEvent");
 let GA_Dash = class GA_Dash extends BP_GameplayAbility_1.BP_GameplayAbility {
     constructor() {
         super(...arguments);
@@ -21,6 +24,7 @@ let GA_Dash = class GA_Dash extends BP_GameplayAbility_1.BP_GameplayAbility {
     K2_ActivateAbility() {
         /*获取所施法角色对象*/
         this.Character = this.GetAvatarActorFromActorInfo();
+        this.HitCall();
         this.K2_CommitAbility();
         this.StartUI_CD();
         this.PlayDashMontage();
@@ -51,6 +55,25 @@ let GA_Dash = class GA_Dash extends BP_GameplayAbility_1.BP_GameplayAbility {
     DashForward() {
         if (this.Character) {
             this.Character.DashForward(this.Character.GetActorForwardVector(), 2000, 0.66);
+        }
+    }
+    //命中监听
+    HitCall() {
+        const GameplayEvent = UE.AbilityTask_WaitGameplayEvent.WaitGameplayEvent(this, DashHitTag, null, false, true);
+        GameplayEvent.EventReceived.Add((...args) => this.HitEvent(...args));
+        GameplayEvent.ReadyForActivation();
+    }
+    HitEvent(Payload) {
+        this.BP_ApplyGameplayEffectToTarget(UE.AbilitySystemBlueprintLibrary.AbilityTargetDataFromActor(Payload.Target), DashDamageClass);
+        const HitCharacter = Payload.Target;
+        if (HitCharacter) {
+            HitCharacter.Stun(1);
+            //两点向量，转化成朝前的旋转
+            const StartLocation = HitCharacter.K2_GetActorLocation();
+            const EndLocation = this.Character.K2_GetActorLocation();
+            const Direction = new UE.Vector(StartLocation.X - EndLocation.X, StartLocation.Y - EndLocation.Y, StartLocation.Z - EndLocation.Z);
+            const ForwardVector = UE.KismetMathLibrary.GetForwardVector(UE.KismetMathLibrary.MakeRotFromX(Direction));
+            HitCharacter.DashForward(ForwardVector, 1700, 0.7);
         }
     }
 };

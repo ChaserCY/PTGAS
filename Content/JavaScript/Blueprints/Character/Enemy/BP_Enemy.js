@@ -15,6 +15,7 @@ const AssetPath = "/Game/BluePrints/Character/Enemy/BP_Enemy.BP_Enemy_C";
 //创建属性
 const AttributeSetHP = new UE.GameplayAttribute("HP", "/Script/PTGAS.BaseAttributeSet:HP", null);
 const AttributeSetMaxHP = new UE.GameplayAttribute("MaxHP", "/Script/PTGAS.BaseAttributeSet:MaxHP", null);
+const MA_Stun = UE.AnimMontage.Load("/Game/BluePrints/Character/Animations/Montage/MA_Stun.MA_Stun");
 let BP_Enemy = class BP_Enemy extends BP_BaseCharacter_1.BP_BaseCharacter {
     constructor() {
         super(...arguments);
@@ -70,6 +71,27 @@ let BP_Enemy = class BP_Enemy extends BP_BaseCharacter_1.BP_BaseCharacter {
         this.NewRotation.Yaw = CameraRotation.Yaw + 180;
         this.NewRotation.Roll = CameraRotation.Roll * -1;
         this.Bar.K2_SetWorldRotation(this.NewRotation, false, null, false);
+    }
+    //停止控制器
+    StopController() {
+        const AIController = UE.AIBlueprintHelperLibrary.GetAIController(this.GetController());
+        if (AIController) {
+            AIController.BrainComponent.StopLogic("Stop Controller");
+        }
+    }
+    ResumeController() {
+        const AIController = UE.AIBlueprintHelperLibrary.GetAIController(this.GetController());
+        if (AIController) {
+            AIController.BrainComponent.RestartLogic();
+        }
+    }
+    //眩晕
+    Stun(StunDuration) {
+        this.StopController();
+        this.PlayAnimMontage(MA_Stun);
+        setTimeout(() => {
+            this.ResumeController();
+        }, StunDuration * 1000);
     }
 };
 BP_Enemy = __decorate([
