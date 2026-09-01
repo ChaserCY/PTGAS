@@ -36,4 +36,5 @@ require("./Blueprints/Ability/BP_GameplayAbility");
 require("./Blueprints/Ability/_01HPRegen/GA_HPRegen");
 require("./Blueprints/Ability/_01HPRegen/GC_HPRegen");
 require("./Blueprints/Ability/_02Dash/GA_Dash");
+require("./Blueprints/Ability/_03Laser/GA_Laser");
 //# sourceMappingURL=MainGame.js.map

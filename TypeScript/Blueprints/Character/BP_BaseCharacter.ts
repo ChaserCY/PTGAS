@@ -29,6 +29,9 @@ export class BP_BaseCharacter implements BP_BaseCharacter {
     //初始化摩擦力
     InitFriction:number = 0;
 
+    //是否正在激光中
+    IsLasering:boolean;
+    
     ReceiveBeginPlay(){
         this.BaseInit();
     }

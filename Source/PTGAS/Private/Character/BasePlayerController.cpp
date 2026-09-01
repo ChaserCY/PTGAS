@@ -22,4 +22,10 @@ void ABasePlayerController::TestAction_Implementation()
 
 void ABasePlayerController::Dash_Implementation()
 {
+	
+}
+
+void ABasePlayerController::Laser_Implementation()
+{
+	
 }

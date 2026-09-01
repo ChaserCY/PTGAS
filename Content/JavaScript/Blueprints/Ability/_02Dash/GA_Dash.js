@@ -52,6 +52,7 @@ let GA_Dash = class GA_Dash extends BP_GameplayAbility_1.BP_GameplayAbility {
     //   this.Character.SetFrictionToZero(false);
     //}
     //}
+    /*Dash函数触发，控制力度和时间*/
     DashForward() {
         if (this.Character) {
             this.Character.DashForward(this.Character.GetActorForwardVector(), 2000, 0.66);

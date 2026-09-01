@@ -18,12 +18,16 @@ const MeleeTag = new UE.GameplayTag("Ability.Melee");
 const HPRegenTag = new UE.GameplayTag("Ability.HPRegen");
 /*冲刺技能标签*/
 const DashTag = new UE.GameplayTag("Ability.Dash");
+/*激光技能标签*/
+const LaserTag = new UE.GameplayTag("Ability.Laser");
+const LaserEndTag = new UE.GameplayTag("Ability.Laser.LaserEnd");
 // #endregion
 // #region InputAction
 const TestAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_Test.IA_Test");
 const MeleeAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_Melee.IA_Melee");
 const HPRegenAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_HPRegen.IA_HPRegen");
 const DashAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_Dash.IA_Dash");
+const LaserAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_Laser.IA_Laser");
 // #endregion
 //主UI类
 const MainUIClass = UE.Class.Load("/Game/BluePrints/Character/Player/UMG/UMG_MainUI.UMG_MainUI_C");
@@ -44,6 +48,7 @@ let BP_PlayerController = class BP_PlayerController {
             InputComponent.BindAction(MeleeAction, UE.ETriggerEvent.Started, this, "Melee");
             InputComponent.BindAction(HPRegenAction, UE.ETriggerEvent.Started, this, "HPRegen");
             InputComponent.BindAction(DashAction, UE.ETriggerEvent.Started, this, "Dash");
+            InputComponent.BindAction(LaserAction, UE.ETriggerEvent.Started, this, "Laser");
         }
     }
     // #region Skill_Function
@@ -61,6 +66,23 @@ let BP_PlayerController = class BP_PlayerController {
         if (this.BP_Player) {
             console.log("按下2键");
             this.BP_Player.ActivateAbility(DashTag);
+        }
+    }
+    //激活激光
+    Laser() {
+        if (this.BP_Player) {
+            console.log("按下3键");
+            if (!this.BP_Player.IsLasering) {
+                this.BP_Player.ActivateAbility(LaserTag);
+            }
+            //如果已经在发射激光，再次按下按键时，发送事件
+            else {
+                const GameplayEventData = new UE.GameplayEventData();
+                GameplayEventData.EventTag = LaserEndTag;
+                GameplayEventData.Instigator = this;
+                GameplayEventData.Target = this;
+                UE.AbilitySystemBlueprintLibrary.SendGameplayEventToActor(this.BP_Player, LaserEndTag, GameplayEventData);
+            }
         }
     }
     HPRegen() {

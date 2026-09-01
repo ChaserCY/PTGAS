@@ -54,7 +54,6 @@ export class GA_Dash extends BP_GameplayAbility implements GA_Dash {
         }
     }
     
-
     /*此函数是k2_EndAbility函数的回调，执行完End后自动执行*/
     //K2_OnEndAbility(bWasCancelled: boolean) {
        // if(this.Character){
@@ -62,6 +61,7 @@ export class GA_Dash extends BP_GameplayAbility implements GA_Dash {
         //}
     //}
 
+    /*Dash函数触发，控制力度和时间*/
     DashForward():void{
         if(this.Character){
             this.Character.DashForward(

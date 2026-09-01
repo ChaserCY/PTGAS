@@ -26,4 +26,7 @@ public:
 	
 	UFUNCTION(BlueprintCallable,BlueprintNativeEvent,Category = "TSLogin")
 	void Dash();
+	
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent,Category = "TSLogic")
+	void Laser();
 };
