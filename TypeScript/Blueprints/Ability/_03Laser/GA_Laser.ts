@@ -2,7 +2,6 @@
 import mixin from "../../../mixin";
 import {BP_GameplayAbility} from "../BP_GameplayAbility";
 import {BP_Player} from "../../Character/Player/BP_Player";
-import {AnimMontage} from "ue";
 //需要导入mixin 模块
 
 //如果该蓝图继承自别的蓝图，还需要导入对应ts模块
@@ -23,6 +22,7 @@ export interface GA_Laser extends UE.Game.BluePrints.Ability._03Laser.GA_Laser.G
 @mixin(AssetPath)
 export class GA_Laser extends BP_GameplayAbility implements GA_Laser {
     Character:BP_Player;
+    _rotationIntervalID:ReturnType<typeof setInterval> | null = null;
     
     K2_ActivateAbility() {
         this.Character = this.GetAvatarActorFromActorInfo() as BP_Player;
@@ -50,6 +50,27 @@ export class GA_Laser extends BP_GameplayAbility implements GA_Laser {
         const GameplayEvent = UE.AbilityTask_WaitGameplayEvent.WaitGameplayEvent(this,LaserEndTag,null,true,true);
         GameplayEvent.EventReceived.Add((...args)=>this.EndMontage(...args));
         GameplayEvent.ReadyForActivation();
+        
+        //按下就会启动，循环计时器
+        this._rotationIntervalID = setInterval(()=>{
+            this.CheckCost();
+        },0.25*1000);
+        
+        const t = UE.KismetSystemLibrary.K2_SetTimer(this,"CheckCost",0.25,true);
+        UE.KismetSystemLibrary.K2_ClearTimerHandle(this,t);
+        
+        
+    }
+    
+    //检测是否消耗完MP
+    CheckCost(){
+        if(!this.IsSatisfyCost()){
+            this.EndMontage(null);
+            console.log("啥意思");
+        }
+        else{
+            console.log("足够消耗")
+        }
     }
     
     
@@ -57,6 +78,10 @@ export class GA_Laser extends BP_GameplayAbility implements GA_Laser {
     EndMontage(Payload: UE.GameplayEventData){
         this.MontageJumpToSection("End");
         this.K2_EndAbility();
+        if(this._rotationIntervalID){
+            clearInterval(this._rotationIntervalID);
+            this._rotationIntervalID = null;
+        }
     }
     
     K2_OnEndAbility(bWasCancelled: boolean) {
@@ -71,7 +96,11 @@ export class GA_Laser extends BP_GameplayAbility implements GA_Laser {
             this.Character.IsLasering = false;
             this.Character.LookCamera(false);
         }
-        
+
+        if(this._rotationIntervalID){
+            clearInterval(this._rotationIntervalID);
+            this._rotationIntervalID = null;
+        }
     }
 
 }

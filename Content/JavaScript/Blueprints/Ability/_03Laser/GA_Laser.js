@@ -19,6 +19,10 @@ const MA_Laser = UE.AnimMontage.Load("/Game/BluePrints/Character/Animations/Mont
 const LaserCostTag = new UE.GameplayTag("Ability.Laser.Cost");
 const LaserEndTag = new UE.GameplayTag("Ability.Laser.LaserEnd");
 let GA_Laser = class GA_Laser extends BP_GameplayAbility_1.BP_GameplayAbility {
+    constructor() {
+        super(...arguments);
+        this._rotationIntervalID = null;
+    }
     K2_ActivateAbility() {
         this.Character = this.GetAvatarActorFromActorInfo();
         if (this.Character) {
@@ -43,11 +47,29 @@ let GA_Laser = class GA_Laser extends BP_GameplayAbility_1.BP_GameplayAbility {
         const GameplayEvent = UE.AbilityTask_WaitGameplayEvent.WaitGameplayEvent(this, LaserEndTag, null, true, true);
         GameplayEvent.EventReceived.Add((...args) => this.EndMontage(...args));
         GameplayEvent.ReadyForActivation();
+        //按下就会启动，计时器
+        this._rotationIntervalID = setInterval(() => {
+            this.CheckCost();
+        }, 0.25 * 1000);
+    }
+    //检测是否消耗完MP
+    CheckCost() {
+        if (!this.IsSatisfyCost()) {
+            this.EndMontage(null);
+            console.log("啥意思");
+        }
+        else {
+            console.log("足够消耗");
+        }
     }
     //结束动画
     EndMontage(Payload) {
         this.MontageJumpToSection("End");
         this.K2_EndAbility();
+        if (this._rotationIntervalID) {
+            clearInterval(this._rotationIntervalID);
+            this._rotationIntervalID = null;
+        }
     }
     K2_OnEndAbility(bWasCancelled) {
         /*提交CD,开始读秒*/
@@ -58,6 +80,10 @@ let GA_Laser = class GA_Laser extends BP_GameplayAbility_1.BP_GameplayAbility {
         if (this.Character) {
             this.Character.IsLasering = false;
             this.Character.LookCamera(false);
+        }
+        if (this._rotationIntervalID) {
+            clearInterval(this._rotationIntervalID);
+            this._rotationIntervalID = null;
         }
     }
 };
