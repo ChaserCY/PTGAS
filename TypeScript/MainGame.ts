@@ -50,3 +50,5 @@ import "./Blueprints/Ability/_01HPRegen/GC_HPRegen";
 import "./Blueprints/Ability/_02Dash/GA_Dash";
 
 import "./Blueprints/Ability/_03Laser/GA_Laser";
+
+import "./Blueprints/Ability/_03Laser/BP_LaserActor";

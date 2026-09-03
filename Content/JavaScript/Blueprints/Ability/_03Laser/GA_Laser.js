@@ -15,13 +15,17 @@ const BP_GameplayAbility_1 = require("../BP_GameplayAbility");
 //import {xxxx} from "../xxxx";
 const AssetPath = "/Game/BluePrints/Ability/_03Laser/GA_Laser.GA_Laser_C";
 const MA_Laser = UE.AnimMontage.Load("/Game/BluePrints/Character/Animations/Montage/MA_Laser.MA_Laser");
+const LaserActorClass = UE.Class.Load("/Game/BluePrints/Ability/_03Laser/BP_LaserActor.BP_LaserActor_C");
+const LaserDamageClass = UE.Class.Load("/Game/BluePrints/Ability/_03Laser/GE_Laser_Damage.GE_Laser_Damage_C");
 //激光消耗Tag
 const LaserCostTag = new UE.GameplayTag("Ability.Laser.Cost");
 const LaserEndTag = new UE.GameplayTag("Ability.Laser.LaserEnd");
+const LaserDamageTag = new UE.GameplayTag("Ability.Laser.Damage");
 let GA_Laser = class GA_Laser extends BP_GameplayAbility_1.BP_GameplayAbility {
     constructor() {
         super(...arguments);
         this._rotationIntervalID = null;
+        this.LaserActor = null;
     }
     K2_ActivateAbility() {
         this.Character = this.GetAvatarActorFromActorInfo();
@@ -41,25 +45,64 @@ let GA_Laser = class GA_Laser extends BP_GameplayAbility_1.BP_GameplayAbility {
     PlayMontage() {
         const MontageTask = UE.AbilityTask_PlayMontageAndWait.CreatePlayMontageAndWaitProxy(this, "Laser", MA_Laser);
         MontageTask.ReadyForActivation();
+        setTimeout(() => {
+            this.SpawnLaserActor();
+        }, 0.3 * 1000);
     }
     //监听回调结束事件
     BindEndEvent() {
         const GameplayEvent = UE.AbilityTask_WaitGameplayEvent.WaitGameplayEvent(this, LaserEndTag, null, true, true);
         GameplayEvent.EventReceived.Add((...args) => this.EndMontage(...args));
         GameplayEvent.ReadyForActivation();
-        //按下就会启动，计时器
+        //按下就会启动，循环计时器
         this._rotationIntervalID = setInterval(() => {
             this.CheckCost();
         }, 0.25 * 1000);
+    }
+    SpawnLaserActor() {
+        console.log("生成Actor");
+        //实例化一个演员类的实例，但不会自动运行其构造脚本
+        this.LaserActor = UE.GameplayStatics.BeginDeferredActorSpawnFromClass(this, LaserActorClass, UE.Transform.Identity);
+        UE.GameplayStatics.FinishSpawningActor(this.LaserActor, UE.Transform.Identity);
+        if (this.LaserActor) {
+            this.SpawnSuccess();
+        }
+    }
+    SpawnSuccess() {
+        //接收激光Actor碰到人后的事件
+        const GameplayEvent = UE.AbilityTask_WaitGameplayEvent.WaitGameplayEvent(this, LaserDamageTag, null, false, true);
+        GameplayEvent.EventReceived.Add((...args) => this.TriggerDamage(...args));
+        GameplayEvent.ReadyForActivation();
+        this.LaserActor.Instigator = this.Character;
+        this.LaserActor.K2_AttachToComponent(this.Character.LaserPoint, "", //普通组件没有SocketName，有骨骼时才填
+        UE.EAttachmentRule.SnapToTarget, UE.EAttachmentRule.SnapToTarget, UE.EAttachmentRule.KeepRelative, false //是否需要物理焊接
+        );
+    }
+    //回调触发伤害
+    TriggerDamage(Payload) {
+        this.BP_ApplyGameplayEffectToTarget(Payload.TargetData, LaserDamageClass);
+        //获取命中Actor,施加冲击效果
+        const HitActors = UE.AbilitySystemBlueprintLibrary.GetActorsFromTargetData(Payload.TargetData, 0);
+        if (HitActors.Num() != 0) {
+            for (let i = 0; i < HitActors.Num(); i++) {
+                const Actor = HitActors.GetRef(i);
+                if (Actor && !Actor.Dead) {
+                    Actor.Stun(0.2);
+                    const StartLocation = Actor.K2_GetActorLocation();
+                    const EndLocation = this.Character.K2_GetActorLocation();
+                    const Direction = new UE.Vector(StartLocation.X - EndLocation.X, StartLocation.Y - EndLocation.Y, StartLocation.Z - EndLocation.Z);
+                    const ForwardVector = UE.KismetMathLibrary.GetForwardVector(UE.KismetMathLibrary.MakeRotFromX(Direction));
+                    Actor.DashForward(ForwardVector, 1000, 0.5);
+                }
+            }
+        }
     }
     //检测是否消耗完MP
     CheckCost() {
         if (!this.IsSatisfyCost()) {
             this.EndMontage(null);
-            console.log("啥意思");
         }
         else {
-            console.log("足够消耗");
         }
     }
     //结束动画
@@ -80,6 +123,9 @@ let GA_Laser = class GA_Laser extends BP_GameplayAbility_1.BP_GameplayAbility {
         if (this.Character) {
             this.Character.IsLasering = false;
             this.Character.LookCamera(false);
+        }
+        if (this.LaserActor) {
+            this.LaserActor.K2_DestroyActor();
         }
         if (this._rotationIntervalID) {
             clearInterval(this._rotationIntervalID);
