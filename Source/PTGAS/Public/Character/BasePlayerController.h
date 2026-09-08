@@ -29,4 +29,10 @@ public:
 	
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent,Category = "TSLogic")
 	void Laser();
+	
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent,Category = "TSLogin")
+	void GroundBlast();
+	
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent,Category = "TSLogic")
+	void RightPressed();
 };

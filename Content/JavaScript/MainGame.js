@@ -38,4 +38,6 @@ require("./Blueprints/Ability/_01HPRegen/GC_HPRegen");
 require("./Blueprints/Ability/_02Dash/GA_Dash");
 require("./Blueprints/Ability/_03Laser/GA_Laser");
 require("./Blueprints/Ability/_03Laser/BP_LaserActor");
+require("./Blueprints/Ability/_04GroundBlast/GA_GroundBlast");
+require("./Blueprints/Ability/_04GroundBlast/BP_GroundSelectTargetActor");
 //# sourceMappingURL=MainGame.js.map

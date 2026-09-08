@@ -15,8 +15,10 @@ const HPRegenTag = new UE.GameplayTag("Ability.HPRegen");
 const DashTag = new UE.GameplayTag("Ability.Dash");
 /*激光技能标签*/
 const LaserTag = new UE.GameplayTag("Ability.Laser");
-
+//激光技能结束标签
 const LaserEndTag  = new UE.GameplayTag("Ability.Laser.LaserEnd");
+//山崩地裂技能标签
+const GroundBlastTag = new UE.GameplayTag("Ability.GroundBlast");
 // #endregion
 
 // #region InputAction
@@ -25,6 +27,8 @@ const MeleeAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_Melee.
 const HPRegenAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_HPRegen.IA_HPRegen")
 const DashAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_Dash.IA_Dash")
 const LaserAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_Laser.IA_Laser")
+const GroundBlastAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_GroundBlast.IA_GroundBlast")
+const RightAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_Right.IA_Right")
 // #endregion
 
 //主UI类
@@ -62,6 +66,8 @@ export class BP_PlayerController implements BP_PlayerController {
             InputComponent.BindAction(HPRegenAction,UE.ETriggerEvent.Started, this,"HPRegen");
             InputComponent.BindAction(DashAction,UE.ETriggerEvent.Started, this,"Dash");
             InputComponent.BindAction(LaserAction,UE.ETriggerEvent.Started, this,"Laser");
+            InputComponent.BindAction(GroundBlastAction,UE.ETriggerEvent.Started, this,"GroundBlast");
+            InputComponent.BindAction(RightAction,UE.ETriggerEvent.Started, this,"RightPressed");
         }
     }
 
@@ -73,11 +79,26 @@ export class BP_PlayerController implements BP_PlayerController {
     //普通攻击(重写 C++ 里的 BlueprintNativeEvent)
     Melee(){
         if(this.BP_Player){
-            this.BP_Player.ActivateAbility(MeleeTag);
-            //对应BP_BaseCharacter.ts里的ActivateAbility方法，传入一个GameplayTag参数
+            if(this.BP_Player.IsGroundBlaseting){
+                this.BP_Player.AbilitySystemComponent.TargetConfirm();
+                this.BP_Player.IsGroundBlaseting = false;
+                
+            }
+            else{
+                //对应BP_BaseCharacter.ts里的ActivateAbility方法，传入一个GameplayTag参数
+                this.BP_Player.ActivateAbility(MeleeTag);
+            }
         }
     }
 
+    RightPressed(){
+        if(this.BP_Player) {
+            this.BP_Player.AbilitySystemComponent.TargetCancel();
+            this.BP_Player.IsGroundBlaseting = false;
+        }
+    }
+    
+    
     Dash() {
         if(this.BP_Player){
             console.log("按下2键")
@@ -104,6 +125,12 @@ export class BP_PlayerController implements BP_PlayerController {
         
     }
 
+    GroundBlast(){
+        if(this.BP_Player){
+            this.BP_Player.ActivateAbility(GroundBlastTag);
+        }
+    }
+    
     HPRegen() {
         console.log("HPRegen");
         if(this.BP_Player){

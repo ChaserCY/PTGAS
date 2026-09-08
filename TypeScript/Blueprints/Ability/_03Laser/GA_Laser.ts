@@ -4,10 +4,6 @@ import {BP_GameplayAbility} from "../BP_GameplayAbility";
 import {BP_Player} from "../../Character/Player/BP_Player";
 import {GameplayEventData} from "ue";
 import {BP_BaseCharacter} from "../../Character/BP_BaseCharacter";
-//需要导入mixin 模块
-
-//如果该蓝图继承自别的蓝图，还需要导入对应ts模块
-//import {xxxx} from "../xxxx";
 
 const AssetPath = "/Game/BluePrints/Ability/_03Laser/GA_Laser.GA_Laser_C";
 
@@ -58,6 +54,7 @@ export class GA_Laser extends BP_GameplayAbility implements GA_Laser {
     
     //监听回调结束事件
     BindEndEvent(){
+        //接收按键结束事件
         const GameplayEvent = UE.AbilityTask_WaitGameplayEvent.WaitGameplayEvent(this,LaserEndTag,null,true,true);
         GameplayEvent.EventReceived.Add((...args)=>this.EndMontage(...args));
         GameplayEvent.ReadyForActivation();

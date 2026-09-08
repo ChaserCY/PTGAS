@@ -127,7 +127,7 @@ let BP_BaseCharacter = class BP_BaseCharacter {
             this.CapsuleComponent.SetCollisionResponseToChannel(UE.ECollisionChannel.ECC_Camera, UE.ECollisionResponse.ECR_Block);
         }
     }
-    /*眩晕*/
+    /*眩晕n秒*/
     Stun(StunDuration) {
     }
 };

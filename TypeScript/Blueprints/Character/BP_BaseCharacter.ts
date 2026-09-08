@@ -22,15 +22,15 @@ export interface BP_BaseCharacter extends UE.Game.BluePrints.Character.BP_BaseCh
 
 @mixin(AssetPath)
 export class BP_BaseCharacter implements BP_BaseCharacter {
-    
     //动画蓝图
     ABP_Sinbi:UE.Game.BluePrints.Character.Animations.ABP_Sinbi.ABP_Sinbi_C = null;
-
     //初始化摩擦力
     InitFriction:number = 0;
-
     //是否正在激光中
     IsLasering:boolean;
+    //是否正在地爆中
+    IsGroundBlaseting:boolean;
+    
     
     ReceiveBeginPlay(){
         this.BaseInit();
@@ -154,7 +154,7 @@ export class BP_BaseCharacter implements BP_BaseCharacter {
         const Impulse = new UE.Vector(
             DashDirection.X * Force,
             DashDirection.Y * Force,
-            DashDirection.Z * Force,
+            DashDirection.Z * Force
         );
         this.CharacterMovement.AddImpulse(Impulse, true);
         
@@ -179,7 +179,7 @@ export class BP_BaseCharacter implements BP_BaseCharacter {
         }
     }
     
-    /*眩晕*/
+    /*眩晕n秒*/
     Stun(StunDuration: number){
         
     }

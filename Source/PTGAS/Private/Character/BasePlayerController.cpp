@@ -29,3 +29,11 @@ void ABasePlayerController::Laser_Implementation()
 {
 	
 }
+
+void ABasePlayerController::GroundBlast_Implementation()
+{
+}
+
+void ABasePlayerController::RightPressed_Implementation()
+{
+}

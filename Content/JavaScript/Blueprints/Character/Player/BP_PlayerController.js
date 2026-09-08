@@ -20,7 +20,10 @@ const HPRegenTag = new UE.GameplayTag("Ability.HPRegen");
 const DashTag = new UE.GameplayTag("Ability.Dash");
 /*激光技能标签*/
 const LaserTag = new UE.GameplayTag("Ability.Laser");
+//激光技能结束标签
 const LaserEndTag = new UE.GameplayTag("Ability.Laser.LaserEnd");
+//山崩地裂技能标签
+const GroundBlastTag = new UE.GameplayTag("Ability.GroundBlast");
 // #endregion
 // #region InputAction
 const TestAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_Test.IA_Test");
@@ -28,6 +31,8 @@ const MeleeAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_Melee.
 const HPRegenAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_HPRegen.IA_HPRegen");
 const DashAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_Dash.IA_Dash");
 const LaserAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_Laser.IA_Laser");
+const GroundBlastAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_GroundBlast.IA_GroundBlast");
+const RightAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_Right.IA_Right");
 // #endregion
 //主UI类
 const MainUIClass = UE.Class.Load("/Game/BluePrints/Character/Player/UMG/UMG_MainUI.UMG_MainUI_C");
@@ -49,6 +54,8 @@ let BP_PlayerController = class BP_PlayerController {
             InputComponent.BindAction(HPRegenAction, UE.ETriggerEvent.Started, this, "HPRegen");
             InputComponent.BindAction(DashAction, UE.ETriggerEvent.Started, this, "Dash");
             InputComponent.BindAction(LaserAction, UE.ETriggerEvent.Started, this, "Laser");
+            InputComponent.BindAction(GroundBlastAction, UE.ETriggerEvent.Started, this, "GroundBlast");
+            InputComponent.BindAction(RightAction, UE.ETriggerEvent.Started, this, "RightPressed");
         }
     }
     // #region Skill_Function
@@ -58,8 +65,20 @@ let BP_PlayerController = class BP_PlayerController {
     //普通攻击(重写 C++ 里的 BlueprintNativeEvent)
     Melee() {
         if (this.BP_Player) {
-            this.BP_Player.ActivateAbility(MeleeTag);
-            //对应BP_BaseCharacter.ts里的ActivateAbility方法，传入一个GameplayTag参数
+            if (this.BP_Player.IsGroundBlaseting) {
+                this.BP_Player.AbilitySystemComponent.TargetConfirm();
+                this.BP_Player.IsGroundBlaseting = false;
+            }
+            else {
+                //对应BP_BaseCharacter.ts里的ActivateAbility方法，传入一个GameplayTag参数
+                this.BP_Player.ActivateAbility(MeleeTag);
+            }
+        }
+    }
+    RightPressed() {
+        if (this.BP_Player) {
+            this.BP_Player.AbilitySystemComponent.TargetCancel();
+            this.BP_Player.IsGroundBlaseting = false;
         }
     }
     Dash() {
@@ -83,6 +102,11 @@ let BP_PlayerController = class BP_PlayerController {
                 GameplayEventData.Target = this;
                 UE.AbilitySystemBlueprintLibrary.SendGameplayEventToActor(this.BP_Player, LaserEndTag, GameplayEventData);
             }
+        }
+    }
+    GroundBlast() {
+        if (this.BP_Player) {
+            this.BP_Player.ActivateAbility(GroundBlastTag);
         }
     }
     HPRegen() {

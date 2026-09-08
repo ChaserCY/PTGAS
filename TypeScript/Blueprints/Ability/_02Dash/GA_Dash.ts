@@ -85,7 +85,7 @@ export class GA_Dash extends BP_GameplayAbility implements GA_Dash {
             HitCharacter.Stun(1);
             //两点向量，转化成朝前的旋转
             const StartLocation = HitCharacter.K2_GetActorLocation();
-            const EndLocation = this.Character.K2_GetActorLocation();
+            const EndLocation = this.Character.K2_GetActorLocation();   
             const Direction = new UE.Vector(
                 StartLocation.X-EndLocation.X,
                 StartLocation.Y-EndLocation.Y,
