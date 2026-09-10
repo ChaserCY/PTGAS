@@ -103,7 +103,7 @@ export class GA_Laser extends BP_GameplayAbility implements GA_Laser {
         if(HitActors.Num()!=0){
             for(let i = 0;i < HitActors.Num();i++){
                 const Actor = HitActors.GetRef(i) as BP_BaseCharacter;
-                if(Actor&&!Actor.Dead){
+                if(Actor instanceof BP_BaseCharacter&&!Actor.Dead){
                     Actor.Stun(0.2);
                     
                     const StartLocation = Actor.K2_GetActorLocation();

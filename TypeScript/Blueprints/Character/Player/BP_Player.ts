@@ -16,6 +16,9 @@ const JumpAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_Jump.IA
 const MoveAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_Move.IA_Move")
 const LookAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_Look.IA_Look")
 
+const PullEventTag = new GameplayTag("Ability.FireBlast.PullEvent");
+const PushEventTag = new GameplayTag("Ability.FireBlast.PushEvent");
+
 //锁定相机
 const LockCameraAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_LockCamera.IA_LockCamera")
 
@@ -260,5 +263,14 @@ export class  BP_Player extends BP_BaseCharacter implements BP_Player {
         }
     }
     
+    //通知GA_FireBlast拉取
+    Pull() {
+        UE.AbilitySystemBlueprintLibrary.SendGameplayEventToActor(this, PullEventTag,null);
+    }
+    
+    Push() {
+        UE.AbilitySystemBlueprintLibrary.SendGameplayEventToActor(this, PushEventTag,null);
+    }
+
 
 }

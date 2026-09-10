@@ -9,7 +9,7 @@ export interface BP_GroundSelectTargetActor extends UE.Game.BluePrints.Ability._
 @mixin(AssetPath)
 export class BP_GroundSelectTargetActor implements BP_GroundSelectTargetActor {
     
-    _rotationIntervalId:ReturnType<typeof setInterval> | null = null;
+    //_rotationIntervalId:ReturnType<typeof setInterval> | null = null;
     
     ReceiveBeginPlay(){
         this.SetDecalSize();
@@ -29,10 +29,5 @@ export class BP_GroundSelectTargetActor implements BP_GroundSelectTargetActor {
         //this.SelectRadius = 150;
         this.Decal.DecalSize = new UE.Vector(100, this.SelectRadius, this.SelectRadius)
     }
-    
-    UpdateLocation(){
-        
-    }
-
     
 }

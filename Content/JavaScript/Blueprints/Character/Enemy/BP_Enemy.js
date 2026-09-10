@@ -57,7 +57,7 @@ let BP_Enemy = class BP_Enemy extends BP_BaseCharacter_1.BP_BaseCharacter {
         if (this.UMG_Bar) {
             this.UMG_Bar.HP = UE.AbilitySystemBlueprintLibrary.GetFloatAttributeFromAbilitySystemComponent(this.AbilitySystemComponent, AttributeSetHP, this.bSuccess);
             this.UMG_Bar.Max_HP = UE.AbilitySystemBlueprintLibrary.GetFloatAttributeFromAbilitySystemComponent(this.AbilitySystemComponent, AttributeSetMaxHP, this.bSuccess);
-            console.log(this.UMG_Bar.HP, this.UMG_Bar.Max_HP);
+            //console.log(this.UMG_Bar.HP,this.UMG_Bar.Max_HP);
         }
     }
     SelfTick() {

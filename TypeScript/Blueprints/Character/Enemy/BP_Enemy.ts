@@ -76,7 +76,7 @@ export class BP_Enemy extends BP_BaseCharacter implements BP_Enemy {
                 AttributeSetMaxHP,
                 this.bSuccess
             );
-            console.log(this.UMG_Bar.HP,this.UMG_Bar.Max_HP);
+            //console.log(this.UMG_Bar.HP,this.UMG_Bar.Max_HP);
         }
     }
 

@@ -10,6 +10,7 @@ exports.GA_Laser = void 0;
 const UE = require("ue");
 const mixin_1 = require("../../../mixin");
 const BP_GameplayAbility_1 = require("../BP_GameplayAbility");
+const BP_BaseCharacter_1 = require("../../Character/BP_BaseCharacter");
 const AssetPath = "/Game/BluePrints/Ability/_03Laser/GA_Laser.GA_Laser_C";
 const MA_Laser = UE.AnimMontage.Load("/Game/BluePrints/Character/Animations/Montage/MA_Laser.MA_Laser");
 const LaserActorClass = UE.Class.Load("/Game/BluePrints/Ability/_03Laser/BP_LaserActor.BP_LaserActor_C");
@@ -84,7 +85,7 @@ let GA_Laser = class GA_Laser extends BP_GameplayAbility_1.BP_GameplayAbility {
         if (HitActors.Num() != 0) {
             for (let i = 0; i < HitActors.Num(); i++) {
                 const Actor = HitActors.GetRef(i);
-                if (Actor && !Actor.Dead) {
+                if (Actor instanceof BP_BaseCharacter_1.BP_BaseCharacter && !Actor.Dead) {
                     Actor.Stun(0.2);
                     const StartLocation = Actor.K2_GetActorLocation();
                     const EndLocation = this.Character.K2_GetActorLocation();

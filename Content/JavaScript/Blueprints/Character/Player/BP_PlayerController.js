@@ -24,6 +24,8 @@ const LaserTag = new UE.GameplayTag("Ability.Laser");
 const LaserEndTag = new UE.GameplayTag("Ability.Laser.LaserEnd");
 //山崩地裂技能标签
 const GroundBlastTag = new UE.GameplayTag("Ability.GroundBlast");
+//火球技能标签
+const FireBlastTag = new UE.GameplayTag("Ability.FireBlast");
 // #endregion
 // #region InputAction
 const TestAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_Test.IA_Test");
@@ -33,6 +35,7 @@ const DashAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_Dash.IA
 const LaserAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_Laser.IA_Laser");
 const GroundBlastAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_GroundBlast.IA_GroundBlast");
 const RightAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_Right.IA_Right");
+const FireBlastAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_FireBlast.IA_FireBlast");
 // #endregion
 //主UI类
 const MainUIClass = UE.Class.Load("/Game/BluePrints/Character/Player/UMG/UMG_MainUI.UMG_MainUI_C");
@@ -56,6 +59,7 @@ let BP_PlayerController = class BP_PlayerController {
             InputComponent.BindAction(LaserAction, UE.ETriggerEvent.Started, this, "Laser");
             InputComponent.BindAction(GroundBlastAction, UE.ETriggerEvent.Started, this, "GroundBlast");
             InputComponent.BindAction(RightAction, UE.ETriggerEvent.Started, this, "RightPressed");
+            InputComponent.BindAction(FireBlastAction, UE.ETriggerEvent.Started, this, "FireBlast");
         }
     }
     // #region Skill_Function
@@ -83,14 +87,12 @@ let BP_PlayerController = class BP_PlayerController {
     }
     Dash() {
         if (this.BP_Player) {
-            console.log("按下2键");
             this.BP_Player.ActivateAbility(DashTag);
         }
     }
     //激活激光
     Laser() {
         if (this.BP_Player) {
-            console.log("按下3键");
             if (!this.BP_Player.IsLasering) {
                 this.BP_Player.ActivateAbility(LaserTag);
             }
@@ -105,8 +107,15 @@ let BP_PlayerController = class BP_PlayerController {
         }
     }
     GroundBlast() {
-        if (this.BP_Player) {
+        //防止多次释放
+        if (this.BP_Player && !this.BP_Player.IsGroundBlaseting) {
             this.BP_Player.ActivateAbility(GroundBlastTag);
+        }
+    }
+    FireBlast() {
+        console.log("按下5键");
+        if (this.BP_Player) {
+            this.BP_Player.ActivateAbility(FireBlastTag);
         }
     }
     HPRegen() {

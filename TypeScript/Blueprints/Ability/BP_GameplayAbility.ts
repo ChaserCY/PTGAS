@@ -16,6 +16,7 @@ export interface BP_GameplayAbility extends UE.Game.BluePrints.Ability.BP_Gamepl
 export class BP_GameplayAbility implements BP_GameplayAbility {
     
     PlayerController:BP_PlayerController;
+    HitActors:UE.TArray<UE.Actor>;
     
 //开始的UI的CD
     StartUI_CD(){

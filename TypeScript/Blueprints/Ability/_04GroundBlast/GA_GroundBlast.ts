@@ -23,7 +23,7 @@ export class GA_GroundBlast extends BP_GameplayAbility implements GA_GroundBlast
     
     Character:BP_BaseCharacter;
     HitLocation:UE.Vector;
-    HitActors:UE.TArray<UE.Actor>;
+    
     
     K2_ActivateAbility() {
         this.Character = this.GetAvatarActorFromActorInfo() as BP_BaseCharacter;
@@ -63,6 +63,8 @@ export class GA_GroundBlast extends BP_GameplayAbility implements GA_GroundBlast
         CastMontageTask.OnInterrupted.Add(()=>this.K2_EndAbility())
         CastMontageTask.OnCancelled.Add(()=>this.K2_EndAbility())
         CastMontageTask.ReadyForActivation();
+        
+        //播放特效
         UE.GameplayStatics.SpawnEmitterAtLocation(
           this,
           this.BlastFX,

@@ -11,9 +11,7 @@ const UE = require("ue");
 const mixin_1 = require("../../../mixin");
 const AssetPath = "/Game/BluePrints/Ability/_04GroundBlast/BP_GroundSelectTargetActor.BP_GroundSelectTargetActor_C";
 let BP_GroundSelectTargetActor = class BP_GroundSelectTargetActor {
-    constructor() {
-        this._rotationIntervalId = null;
-    }
+    //_rotationIntervalId:ReturnType<typeof setInterval> | null = null;
     ReceiveBeginPlay() {
         this.SetDecalSize();
         // this._rotationIntervalId = setInterval(()=>{
@@ -27,8 +25,6 @@ let BP_GroundSelectTargetActor = class BP_GroundSelectTargetActor {
     SetDecalSize() {
         //this.SelectRadius = 150;
         this.Decal.DecalSize = new UE.Vector(100, this.SelectRadius, this.SelectRadius);
-    }
-    UpdateLocation() {
     }
 };
 BP_GroundSelectTargetActor = __decorate([

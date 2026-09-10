@@ -34,6 +34,7 @@ let GA_GroundBlast = class GA_GroundBlast extends BP_GameplayAbility_1.BP_Gamepl
     }
     //成功释放能力
     ValidData(Data) {
+        //Bug:第二次释放技能会崩溃
         if (Data) {
             this.HitLocation = UE.AbilitySystemBlueprintLibrary.GetTargetDataEndPoint(Data, 0);
             this.HitActors = UE.AbilitySystemBlueprintLibrary.GetActorsFromTargetData(Data, 1);
@@ -53,6 +54,7 @@ let GA_GroundBlast = class GA_GroundBlast extends BP_GameplayAbility_1.BP_Gamepl
         CastMontageTask.OnInterrupted.Add(() => this.K2_EndAbility());
         CastMontageTask.OnCancelled.Add(() => this.K2_EndAbility());
         CastMontageTask.ReadyForActivation();
+        //播放特效
         UE.GameplayStatics.SpawnEmitterAtLocation(this, this.BlastFX, this.HitLocation, UE.Rotator.ZeroRotator, //旋转
         new UE.Vector(0.5, 0.5, 0.5), //大小
         true, //是否自动销毁

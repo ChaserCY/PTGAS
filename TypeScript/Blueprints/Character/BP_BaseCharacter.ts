@@ -16,6 +16,8 @@ const GA_MeleeClass = UE.Class.Load("/Game/BluePrints/Ability/_00Melee/GA_Melee.
 //命中标签
 const MeleeHitTag = new UE.GameplayTag("Ability.Melee.HitEvent");
 
+const AbilityAllTag = new UE.GameplayTag("Ability");
+
 
 export interface BP_BaseCharacter extends UE.Game.BluePrints.Character.BP_BaseCharacter.BP_BaseCharacter_C{
 }
@@ -91,8 +93,8 @@ export class BP_BaseCharacter implements BP_BaseCharacter {
     WeaponOverlop(OverlappedComponent: $Nullable<UE.PrimitiveComponent>, OtherActor: $Nullable<UE.Actor>, OtherComp: $Nullable<UE.PrimitiveComponent>, OtherBodyIndex: number, bFromSweep: boolean, SweepResult: UE.HitResult)
     {
         if(this == OtherActor) return;
-        
-        if(!this.HitActor.Contains(OtherActor)){
+        //防止敌人之间互相伤害
+        if(!this.HitActor.Contains(OtherActor)&&this.GetClass()!=OtherActor.GetClass()){
             
             this.HitActor.Add(OtherActor);
             //这个数组存起来，保证每次平A只会命中一次
@@ -136,6 +138,8 @@ export class BP_BaseCharacter implements BP_BaseCharacter {
             //移除被动回复效果
             this.AbilitySystemComponent.RemoveActiveEffectsWithTags(this.GetAbilityTag(BaseResponseTag));
             this.CapsuleComponent.SetCollisionEnabled(UE.ECollisionEnabled.NoCollision);
+            //死亡移除所有自身资产标签匹配的 GE
+            this.AbilitySystemComponent.RemoveActiveEffectsWithTags(this.GetAbilityTag(AbilityAllTag));
         }
     }
 

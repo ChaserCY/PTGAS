@@ -17,6 +17,8 @@ const DashHitTag = new ue_1.GameplayTag("Ability.Dash.HitEvent");
 const JumpAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_Jump.IA_Jump");
 const MoveAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_Move.IA_Move");
 const LookAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_Look.IA_Look");
+const PullEventTag = new ue_1.GameplayTag("Ability.FireBlast.PullEvent");
+const PushEventTag = new ue_1.GameplayTag("Ability.FireBlast.PushEvent");
 //锁定相机
 const LockCameraAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_LockCamera.IA_LockCamera");
 //const IMC_Default = UE.Object.Load("/Game/BluePrints/Input/IMC_Default.IMC_Default") as UE.InputMappingContext;//加载资源，注意类型
@@ -190,6 +192,13 @@ let BP_Player = class BP_Player extends BP_BaseCharacter_1.BP_BaseCharacter {
             const Pre = Value / UE.AbilitySystemBlueprintLibrary.GetFloatAttributeFromAbilitySystemComponent(this.AbilitySystemComponent, AttributeSetMaxSP, null);
             this.PlayerController.MainUI.SPAttributeBar.SetProgress(Pre);
         }
+    }
+    //通知GA_FireBlast拉取
+    Pull() {
+        UE.AbilitySystemBlueprintLibrary.SendGameplayEventToActor(this, PullEventTag, null);
+    }
+    Push() {
+        UE.AbilitySystemBlueprintLibrary.SendGameplayEventToActor(this, PushEventTag, null);
     }
 };
 BP_Player = __decorate([

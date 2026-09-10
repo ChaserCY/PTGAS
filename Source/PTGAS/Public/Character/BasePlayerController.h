@@ -35,4 +35,8 @@ public:
 	
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent,Category = "TSLogic")
 	void RightPressed();
+	
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent,Category = "TSLogic")
+	void FireBlast();
+	
 };

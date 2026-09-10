@@ -37,3 +37,7 @@ void ABasePlayerController::GroundBlast_Implementation()
 void ABasePlayerController::RightPressed_Implementation()
 {
 }
+
+void ABasePlayerController::FireBlast_Implementation()
+{
+}

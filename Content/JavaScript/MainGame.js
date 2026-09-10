@@ -40,4 +40,10 @@ require("./Blueprints/Ability/_03Laser/GA_Laser");
 require("./Blueprints/Ability/_03Laser/BP_LaserActor");
 require("./Blueprints/Ability/_04GroundBlast/GA_GroundBlast");
 require("./Blueprints/Ability/_04GroundBlast/BP_GroundSelectTargetActor");
+require("./Blueprints/Ability/_05FireBlast/GA_FireBlast");
+require("./Blueprints/Ability/_05FireBlast/GCN_Burming");
+require("./Blueprints/Ability/_05FireBlast/BP_RemoveBurming");
+require("./Blueprints/Character/Enemy/AI/BTS_CheckDead");
+require("./Blueprints/Character/Enemy/AI/BTS_CheckBurming");
+require("./Blueprints/Character/Enemy/AI/BTT_FindRemoveBurming");
 //# sourceMappingURL=MainGame.js.map
