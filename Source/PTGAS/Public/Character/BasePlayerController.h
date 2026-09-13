@@ -14,6 +14,9 @@ class PTGAS_API ABasePlayerController : public APlayerController
 {
 	GENERATED_BODY()
 	
+protected:
+	virtual void BeginPlay() override;
+	
 public:
 	UFUNCTION(BlueprintCallable,BlueprintNativeEvent,Category = "TSLogic")
 	void Melee();

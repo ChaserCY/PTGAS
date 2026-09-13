@@ -4,7 +4,7 @@ import {BP_BaseCharacter} from "../BP_BaseCharacter";
 import {UMG_MainUI} from "./UMG/UMG_MainUI";
 
 // 直接注入 C++ ABasePlayerController 类
-const BasePlayerControllerPath = "/Script/PTGAS.BasePlayerController";
+const BasePlayerControllerPath = "/Game/BluePrints/Character/Player/BP_PlayerController.BP_PlayerController_C";
 
 // #region GameplayTag
 /*普通攻击标签*/
@@ -38,7 +38,7 @@ const FireBlastAction = UE.InputAction.Load("/Game/BluePrints/Input/Action/IA_Fi
 //主UI类
 const MainUIClass = UE.Class.Load("/Game/BluePrints/Character/Player/UMG/UMG_MainUI.UMG_MainUI_C")
 
-export interface BP_PlayerController extends UE.BasePlayerController {
+export interface BP_PlayerController extends UE.Game.BluePrints.Character.Player.BP_PlayerController.BP_PlayerController_C {
 }
 
 @mixin(BasePlayerControllerPath)

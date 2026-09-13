@@ -41,3 +41,8 @@ void ABasePlayerController::RightPressed_Implementation()
 void ABasePlayerController::FireBlast_Implementation()
 {
 }
+
+void ABasePlayerController::BeginPlay()
+{
+	Super::BeginPlay();
+}

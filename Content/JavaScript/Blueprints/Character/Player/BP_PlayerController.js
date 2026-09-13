@@ -10,7 +10,7 @@ exports.BP_PlayerController = void 0;
 const UE = require("ue");
 const mixin_1 = require("../../../mixin");
 // 直接注入 C++ ABasePlayerController 类
-const BasePlayerControllerPath = "/Script/PTGAS.BasePlayerController";
+const BasePlayerControllerPath = "/Game/BluePrints/Character/Player/BP_PlayerController.BP_PlayerController_C";
 // #region GameplayTag
 /*普通攻击标签*/
 const MeleeTag = new UE.GameplayTag("Ability.Melee");
