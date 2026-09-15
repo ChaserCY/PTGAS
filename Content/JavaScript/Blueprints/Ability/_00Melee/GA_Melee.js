@@ -19,8 +19,8 @@ let GA_Melee =
 class GA_Melee {
     //当GA触发的时候执行
     K2_ActivateAbility() {
-        console.log("普通攻击生效");
-        UE.KismetSystemLibrary.PrintString(this, "热更生效", true, true, new UE.LinearColor(1, 1, 0, 1), 10);
+        //console.log("普通攻击生效");
+        //UE.KismetSystemLibrary.PrintString(this,"热更生效",true,true,new UE.LinearColor(1,1,0,1),10);
         //UE.KismetSystemLibrary.PrintString(this, "命中事件触发", true, true, new UE.LinearColor(1, 0, 0, 1), 5);
         this.K2_CommitAbility();
         this.BindHitEvent();
