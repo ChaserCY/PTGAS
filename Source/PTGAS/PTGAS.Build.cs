@@ -1,5 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
+using EpicGames.Core;
 using UnrealBuildTool;
 
 public class PTGAS : ModuleRules
@@ -18,7 +19,10 @@ public class PTGAS : ModuleRules
 			"GameplayTasks",
 			"GameplayAbilities",
 			"Puerts",
-			"JsEnv"
+			"JsEnv",
+			"Http",
+			"Json",
+			"JsonUtilities"
 			
 		});
 
