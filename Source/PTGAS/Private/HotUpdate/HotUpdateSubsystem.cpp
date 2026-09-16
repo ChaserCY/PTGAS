@@ -8,7 +8,7 @@
 void UHotUpdateSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
     Super::Initialize(Collection);
-    // 本地版本号记录文件存放在沙盒 PersistentDownloadDir 目录下
+    // 本地版本号记录文件存放在Saved/PersistentDownloadDir/ 目录下
     LocalVersionFilePath = FPaths::ProjectPersistentDownloadDir() / TEXT("version.json");
 }
 
@@ -17,9 +17,11 @@ FString UHotUpdateSubsystem::GetLocalVersion() const
     if (FPlatformFileManager::Get().GetPlatformFile().FileExists(*LocalVersionFilePath))
     {
         FString JsonStr;
+        //读入磁盘文件内容到JsonStr
         if (FFileHelper::LoadFileToString(JsonStr, *LocalVersionFilePath))
         {
             FVersionInfo LocalInfo;
+            //将JsonStr转换为FVersionInfo结构体
             if (FJsonObjectConverter::JsonObjectStringToUStruct(JsonStr, &LocalInfo, 0, 0))
             {
                 return LocalInfo.version;
@@ -43,9 +45,11 @@ void UHotUpdateSubsystem::StartCheckUpdate(const FString& RemoteVersionUrl)
 {
     UE_LOG(LogTemp, Log, TEXT("[HotUpdate] 正在向服务器请求版本信息..."));
     TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = FHttpModule::Get().CreateRequest();
+    //绑定请求完成回调函数
     Request->OnProcessRequestComplete().BindUObject(this, &UHotUpdateSubsystem::OnRemoteVersionResponse);
     Request->SetURL(RemoteVersionUrl);
     Request->SetVerb(TEXT("GET"));
+    //发送请求，异步处理，不会阻塞主线程，直到请求完成或超时
     Request->ProcessRequest();
 }
 
@@ -54,16 +58,19 @@ void UHotUpdateSubsystem::OnRemoteVersionResponse(FHttpRequestPtr Request, FHttp
     if (!bWasSuccessful || !Response.IsValid() || Response->GetResponseCode() != 200)
     {
         UE_LOG(LogTemp, Warning, TEXT("[HotUpdate] 检查版本失败，跳过热更直接进入游戏。"));
+        // 通知 UI 弹出“检查版本失败”
         OnCheckVersionResult.Broadcast(false, TEXT(""));
         return;
     }
 
+    //将Http响应内容转换为字符串，再解析为FVersionInfo结构体
     FString ResponseStr = Response->GetContentAsString();
     FJsonObjectConverter::JsonObjectStringToUStruct(ResponseStr, &CachedRemoteInfo, 0, 0);
 
     FString LocalVer = GetLocalVersion();
     UE_LOG(LogTemp, Log, TEXT("[HotUpdate] 本地版本: %s | 远端版本: %s"), *LocalVer, *CachedRemoteInfo.version);
 
+    //比较版本字符串
     if (LocalVer.Equals(CachedRemoteInfo.version))
     {
         // 版本相同，无需更新
@@ -143,8 +150,10 @@ void UHotUpdateSubsystem::RestartGameApp()
     #endif
     
         // 以下代码仅在【打包后的独立游戏（Standalone）】中才会执行：
+    // 1. 获取当前游戏进程的路径和命令行参数
         FString ExecutablePath = FPlatformProcess::ExecutablePath();
-        FString CommandLine = FCommandLine::Get();
+    // 2. 获取当前游戏进程的命令行参数
+    FString CommandLine = FCommandLine::Get();
     
         // 1. 启动一个新的游戏进程
         FPlatformProcess::CreateProc(*ExecutablePath, *CommandLine, true, false, false, nullptr, 0, nullptr, nullptr);

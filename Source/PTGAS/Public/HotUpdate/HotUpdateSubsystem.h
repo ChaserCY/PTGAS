@@ -11,7 +11,8 @@
 /**
  * 
  */
-
+//vision.json同款结构
+//变量名必须与JSON的键名一致
 USTRUCT()
 struct FVersionInfo
 {
@@ -33,23 +34,27 @@ class PTGAS_API UHotUpdateSubsystem : public UGameInstanceSubsystem
 	GENERATED_BODY()
 	
 	public:
-        virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+	//重写初始化
+	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
     
-	// 蓝图可调用的热更入口
+	// 1.蓝图可调用的热更大入口，接收一个URL，向网页发送Get请求
 	UFUNCTION(BlueprintCallable, Category = "HotUpdate")
 	void StartCheckUpdate(const FString& RemoteVersionUrl);
     
-	// 2. 蓝图调用的重启游戏接口
+	// 2. 蓝图调用的重启游戏接口(内含PIE与打包版本的隔离)
 	UFUNCTION(BlueprintCallable, Category = "HotUpdate")
 	void RestartGameApp();
 	
 	// 蓝图可绑定的事件（用来在 UI 上做弹窗、进度条）
+	//检查是否有新版本，返回bool和新版本的vision
 	UPROPERTY(BlueprintAssignable, Category = "HotUpdate|Events")
 	FOnCheckVersionResult OnCheckVersionResult;
 
+	//持续更新进度，返回一个小数值
 	UPROPERTY(BlueprintAssignable, Category = "HotUpdate|Events")
 	FOnUpdateProgress OnUpdateProgress;
 
+	//是否更新完成
 	UPROPERTY(BlueprintAssignable, Category = "HotUpdate|Events")
 	FOnUpdateFinished OnUpdateFinished;
 	
@@ -62,9 +67,10 @@ class PTGAS_API UHotUpdateSubsystem : public UGameInstanceSubsystem
 	void OnDownloadResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful, FString SavePath);
 	//下载进度上，回调
 	void OnDownloadProgress(FHttpRequestPtr Request, int32 BytesSent, int32 BytesReceived);
-    //获取本地版本
+    
+	//获取本地版本
 	FString GetLocalVersion() const;
-	//保存本地版本
+	//保存新版本至本地文件
 	void SaveLocalVersion(const FString& NewVersion);
 	//缓存远程版本信息
 	FVersionInfo CachedRemoteInfo;
