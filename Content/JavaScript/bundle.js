@@ -30,7 +30,7 @@ var __decorateClass = (decorators, target, key, kind) => {
 };
 
 // MainGame.ts
-var UE29 = __toESM(require("ue"));
+var UE30 = __toESM(require("ue"));
 var import_puerts4 = require("puerts");
 
 // Blueprints/Test/BP_Test.ts
@@ -425,8 +425,6 @@ var MeleeDamageClass = UE5.Class.Load("/Game/BluePrints/Ability/_00Melee/GE_Mele
 var GA_Melee = class {
   //当GA触发的时候执行
   K2_ActivateAbility() {
-    console.log("\u666E\u901A\u653B\u51FB\u751F\u6548");
-    UE5.KismetSystemLibrary.PrintString(this, "\u70ED\u66F4\u751F\u6548", true, true, new UE5.LinearColor(1, 1, 0, 1), 10);
     this.K2_CommitAbility();
     this.BindHitEvent();
     this.PlayMeleeMontage();
@@ -1480,15 +1478,86 @@ BTT_FindRemoveBurming = __decorateClass([
   mixin(AssetPath27)
 ], BTT_FindRemoveBurming);
 
+// Gen/GameplayTags.gen.ts
+var UE29 = __toESM(require("ue"));
+function _createTag(name) {
+  const tag = new UE29.GameplayTag();
+  tag.TagName = name;
+  return tag;
+}
+var TagsfromPlugin = {
+  /** Tag: Ability.BaseResponse */
+  Ability_BaseResponse: _createTag("Ability.BaseResponse"),
+  /** Tag: Ability.Dash */
+  Ability_Dash: _createTag("Ability.Dash"),
+  /** Tag: Ability.Dash.Active */
+  Ability_Dash_Active: _createTag("Ability.Dash.Active"),
+  /** Tag: Ability.Dash.HitEvent */
+  Ability_Dash_HitEvent: _createTag("Ability.Dash.HitEvent"),
+  /** Tag: Ability.FireBlast */
+  Ability_FireBlast: _createTag("Ability.FireBlast"),
+  /** Tag: Ability.FireBlast.BurmingDamage */
+  Ability_FireBlast_BurmingDamage: _createTag("Ability.FireBlast.BurmingDamage"),
+  /** Tag: Ability.FireBlast.PullDamage */
+  Ability_FireBlast_PullDamage: _createTag("Ability.FireBlast.PullDamage"),
+  /** Tag: Ability.FireBlast.PullEvent */
+  Ability_FireBlast_PullEvent: _createTag("Ability.FireBlast.PullEvent"),
+  /** Tag: Ability.FireBlast.PushDamage */
+  Ability_FireBlast_PushDamage: _createTag("Ability.FireBlast.PushDamage"),
+  /** Tag: Ability.FireBlast.PushEvent */
+  Ability_FireBlast_PushEvent: _createTag("Ability.FireBlast.PushEvent"),
+  /** Tag: Ability.GroundBlast */
+  Ability_GroundBlast: _createTag("Ability.GroundBlast"),
+  /** Tag: Ability.HPRegen */
+  Ability_HPRegen: _createTag("Ability.HPRegen"),
+  /** Tag: Ability.Laser */
+  Ability_Laser: _createTag("Ability.Laser"),
+  /** Tag: Ability.Laser.Cost */
+  Ability_Laser_Cost: _createTag("Ability.Laser.Cost"),
+  /** Tag: Ability.Laser.Damage */
+  Ability_Laser_Damage: _createTag("Ability.Laser.Damage"),
+  /** Tag: Ability.Laser.LaserEnd */
+  Ability_Laser_LaserEnd: _createTag("Ability.Laser.LaserEnd"),
+  /** Tag: Ability.Melee */
+  Ability_Melee: _createTag("Ability.Melee"),
+  /** Tag: Ability.Melee.HitEvent */
+  Ability_Melee_HitEvent: _createTag("Ability.Melee.HitEvent"),
+  /** Tag: GameplayCue */
+  GameplayCue: _createTag("GameplayCue"),
+  /** Tag: GameplayCue.Burming */
+  GameplayCue_Burming: _createTag("GameplayCue.Burming"),
+  /** Tag: GameplayCue.HPRegen */
+  GameplayCue_HPRegen: _createTag("GameplayCue.HPRegen"),
+  /** Tag: InputUserSettings.FailureReasons.InvalidMappingName */
+  InputUserSettings_FailureReasons_InvalidMappingName: _createTag("InputUserSettings.FailureReasons.InvalidMappingName"),
+  /** Tag: InputUserSettings.FailureReasons.NoKeyProfile */
+  InputUserSettings_FailureReasons_NoKeyProfile: _createTag("InputUserSettings.FailureReasons.NoKeyProfile"),
+  /** Tag: InputUserSettings.FailureReasons.NoMappingRowFound */
+  InputUserSettings_FailureReasons_NoMappingRowFound: _createTag("InputUserSettings.FailureReasons.NoMappingRowFound"),
+  /** Tag: InputUserSettings.FailureReasons.NoMatchingMappings */
+  InputUserSettings_FailureReasons_NoMatchingMappings: _createTag("InputUserSettings.FailureReasons.NoMatchingMappings"),
+  /** Tag: InputUserSettings.Profiles.Default */
+  InputUserSettings_Profiles_Default: _createTag("InputUserSettings.Profiles.Default"),
+  /** Tag: Tests.Cest.1 */
+  Tests_Cest_1: _createTag("Tests.Cest.1"),
+  /** Tag: Tests.Cest.2 */
+  Tests_Cest_2: _createTag("Tests.Cest.2"),
+  /** Tag: Tests.Cest.3 */
+  Tests_Cest_3: _createTag("Tests.Cest.3"),
+  /** Tag: Tests.GenericTag */
+  Tests_GenericTag: _createTag("Tests.GenericTag")
+};
+globalThis.TagsfromPlugin = TagsfromPlugin;
+
 // MainGame.ts
 console.log("Hello, TypeScript!");
-UE29.KismetSystemLibrary.PrintString(
+UE30.KismetSystemLibrary.PrintString(
   //打印在屏幕上
   null,
   `\u542F\u52A8\uFF01\uFF01`,
   true,
   true,
-  UE29.LinearColor.Green,
+  UE30.LinearColor.Green,
   0.1
 );
 var GameInstance = import_puerts4.argv.getByName("GameInstance");

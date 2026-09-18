@@ -80,3 +80,9 @@ ts_file_versions_info.json
 node_modules
 Typing
 .claude
+.tmp-codex-home/
+.claude_tmp_extract.py
+.claude_tmp_sessions.py
+.tmp-claude-review-smoke.md
+.tmp-claude-review-test.md
+review-result.md

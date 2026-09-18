@@ -9,7 +9,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.BP_Test = void 0;
 const UE = require("ue");
 const mixin_1 = require("../../mixin"); //额外添加这一行使得10行不会报错@mixin(AssetPath)
-const AssetPath = "/Game/BluePrints/Test/BP_Test.BP_Test_C"; //这里的路径必须和Content中的蓝图ACtor路径对应，并且.后面必须是BP_Test_C加个_C 
+const AssetPath = "/Game/BluePrints/Test/BP_Test.BP_Test_C"; //这里的路径必须和Content中的蓝图ACtor路径对应，并且.后面必须是BP_Test_C加个_C
 let BP_Test = class BP_Test {
     Fun1() {
         UE.KismetSystemLibrary.PrintString(this, "我是函数1", true, true, UE.LinearColor.Red, 2);

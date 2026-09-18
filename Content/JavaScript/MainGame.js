@@ -46,4 +46,5 @@ require("./Blueprints/Ability/_05FireBlast/BP_RemoveBurming");
 require("./Blueprints/Character/Enemy/AI/BTS_CheckDead");
 require("./Blueprints/Character/Enemy/AI/BTS_CheckBurming");
 require("./Blueprints/Character/Enemy/AI/BTT_FindRemoveBurming");
+require("./Gen/GameplayTags.gen");
 //# sourceMappingURL=MainGame.js.map

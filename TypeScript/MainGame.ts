@@ -63,3 +63,5 @@ import "./Blueprints/Character/Enemy/AI/BTS_CheckDead";
 
 import "./Blueprints/Character/Enemy/AI/BTS_CheckBurming";
 import "./Blueprints/Character/Enemy/AI/BTT_FindRemoveBurming";
+
+import "./Gen/GameplayTags.gen"

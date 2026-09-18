@@ -1,7 +1,8 @@
 ﻿import * as UE from "ue";
 import mixin from "../../mixin";//额外添加这一行使得10行不会报错@mixin(AssetPath)
+import {TagsfromPlugin} from "../../Gen/GameplayTags.gen";
 
-const AssetPath = "/Game/BluePrints/Test/BP_Test.BP_Test_C";//这里的路径必须和Content中的蓝图ACtor路径对应，并且.后面必须是BP_Test_C加个_C 
+const AssetPath = "/Game/BluePrints/Test/BP_Test.BP_Test_C";//这里的路径必须和Content中的蓝图ACtor路径对应，并且.后面必须是BP_Test_C加个_C
 
 export interface BP_Test extends UE.Game.BluePrints.Test.BP_Test.BP_Test_C{
     
