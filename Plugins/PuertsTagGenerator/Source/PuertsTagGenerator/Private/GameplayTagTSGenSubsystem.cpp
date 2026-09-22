@@ -65,7 +65,7 @@ void UGameplayTagTSGenSubsystem::TriggerGenerateWithDebounce()
 		FTickerDelegate::CreateWeakLambda(this, [this](float DeltaTime) -> bool
 			{
 				GenerateGameplayTagTS();
-				DebounceTickerHandle.Reset();
+				DebounceTickerHandle.Reset();// 重置句柄，准备下一次触发
 				return false; // 返回 false 表示只执行一次（不循环）
 			}),
 		0.5f // 延迟 0.5 秒防抖
