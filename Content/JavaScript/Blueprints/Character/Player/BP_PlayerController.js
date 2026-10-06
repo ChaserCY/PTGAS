@@ -49,18 +49,27 @@ let BP_PlayerController = class BP_PlayerController {
         this.BindKey(); //手动绑定自定义按键
     }
     //绑定按键
-    BindKey() {
+    //PlayerController 的输入组件也可能在 BeginPlay 时还没就绪，拿不到就重试（同 BP_Player.BindKey）
+    BindKey(Retry = 0) {
         const InputComponent = this.GetComponentByClass(UE.EnhancedInputComponent.StaticClass());
-        if (InputComponent) {
-            InputComponent.BindAction(TestAction, UE.ETriggerEvent.Started, this, "TestAction"); //这里的第一个函数必须是蓝图函数，或者C++蓝图可以调用的函数
-            InputComponent.BindAction(MeleeAction, UE.ETriggerEvent.Started, this, "Melee");
-            InputComponent.BindAction(HPRegenAction, UE.ETriggerEvent.Started, this, "HPRegen");
-            InputComponent.BindAction(DashAction, UE.ETriggerEvent.Started, this, "Dash");
-            InputComponent.BindAction(LaserAction, UE.ETriggerEvent.Started, this, "Laser");
-            InputComponent.BindAction(GroundBlastAction, UE.ETriggerEvent.Started, this, "GroundBlast");
-            InputComponent.BindAction(RightAction, UE.ETriggerEvent.Started, this, "RightPressed");
-            InputComponent.BindAction(FireBlastAction, UE.ETriggerEvent.Started, this, "FireBlast");
+        if (!InputComponent) {
+            if (Retry < 40) {
+                setTimeout(() => this.BindKey(Retry + 1), 50); //最多重试2秒
+            }
+            else {
+                console.error(`[Input] ${this.GetName()} 技能键未绑定：拿不到 EnhancedInputComponent`);
+            }
+            return;
         }
+        InputComponent.BindAction(TestAction, UE.ETriggerEvent.Started, this, "TestAction"); //这里的第一个函数必须是蓝图函数，或者C++蓝图可以调用的函数
+        InputComponent.BindAction(MeleeAction, UE.ETriggerEvent.Started, this, "Melee");
+        InputComponent.BindAction(HPRegenAction, UE.ETriggerEvent.Started, this, "HPRegen");
+        InputComponent.BindAction(DashAction, UE.ETriggerEvent.Started, this, "Dash");
+        InputComponent.BindAction(LaserAction, UE.ETriggerEvent.Started, this, "Laser");
+        InputComponent.BindAction(GroundBlastAction, UE.ETriggerEvent.Started, this, "GroundBlast");
+        InputComponent.BindAction(RightAction, UE.ETriggerEvent.Started, this, "RightPressed");
+        InputComponent.BindAction(FireBlastAction, UE.ETriggerEvent.Started, this, "FireBlast");
+        console.log(`[Input] ${this.GetName()} 技能键已绑定(重试${Retry}次)`);
     }
     // #region Skill_Function
     TestAction() {

@@ -257,32 +257,48 @@ var BP_Player = class extends BP_BaseCharacter {
     this.Sphere.OnComponentBeginOverlap.Add((...args) => this.SphereOnOverlap(...args));
   }
   //添加输入映射
-  AddMappingContext() {
-    if (this.PlayerController) {
-      let EnhanceInputSubsystem = UE4.SubsystemBlueprintLibrary.GetLocalPlayerSubSystemFromPlayerController(
-        this.PlayerController,
-        UE4.EnhancedInputLocalPlayerSubsystem.StaticClass()
-      );
-      if (EnhanceInputSubsystem && IMC_Default) {
-        EnhanceInputSubsystem.AddMappingContext(IMC_Default, 0);
+  //注意：切关/热更重启虚拟机后，PlayerController 与 EnhancedInput 子系统不一定已经就绪，
+  //原来一次拿不到就永久跳过了（表现为人物和UI都正常，但按键全都没反应），所以改成拿不到就重试
+  AddMappingContext(Retry = 0) {
+    this.PlayerController = UE4.GameplayStatics.GetPlayerController(this, 0);
+    let EnhanceInputSubsystem = this.PlayerController ? UE4.SubsystemBlueprintLibrary.GetLocalPlayerSubSystemFromPlayerController(
+      this.PlayerController,
+      UE4.EnhancedInputLocalPlayerSubsystem.StaticClass()
+    ) : null;
+    if (!this.PlayerController || !EnhanceInputSubsystem || !IMC_Default) {
+      if (Retry < 40) {
+        setTimeout(() => this.AddMappingContext(Retry + 1), 50);
+      } else {
+        console.error(`[Input] ${this.GetName()} \u8F93\u5165\u521D\u59CB\u5316\u5931\u8D25: PlayerController=${this.PlayerController} \u5B50\u7CFB\u7EDF=${EnhanceInputSubsystem} IMC=${IMC_Default}`);
       }
-      const CameraManager = UE4.GameplayStatics.GetPlayerCameraManager(this, 0);
-      if (CameraManager) {
-        CameraManager.ViewPitchMin = -65;
-        CameraManager.ViewPitchMax = 25;
-      }
-      this.BindKey();
+      return;
     }
+    EnhanceInputSubsystem.AddMappingContext(IMC_Default, 0);
+    console.log(`[Input] ${this.GetName()} IMC \u5DF2\u6CE8\u518C(\u91CD\u8BD5${Retry}\u6B21)`);
+    const CameraManager = UE4.GameplayStatics.GetPlayerCameraManager(this, 0);
+    if (CameraManager) {
+      CameraManager.ViewPitchMin = -65;
+      CameraManager.ViewPitchMax = 25;
+    }
+    this.BindKey();
   }
   //绑定按键
-  BindKey() {
+  //角色的 EnhancedInputComponent 是"被 Controller 附身"时才创建的，BeginPlay 时可能还不存在，同样重试
+  BindKey(Retry = 0) {
     const InputComponent = this.GetComponentByClass(UE4.EnhancedInputComponent.StaticClass());
-    if (InputComponent) {
-      InputComponent.BindAction(JumpAction, UE4.ETriggerEvent.Started, this, "Jumpp");
-      InputComponent.BindAction(MoveAction, UE4.ETriggerEvent.Triggered, this, "Move");
-      InputComponent.BindAction(LookAction, UE4.ETriggerEvent.Triggered, this, "Look");
-      InputComponent.BindAction(LockCameraAction, UE4.ETriggerEvent.Started, this, "IA_LockCamera");
+    if (!InputComponent) {
+      if (Retry < 40) {
+        setTimeout(() => this.BindKey(Retry + 1), 50);
+      } else {
+        console.error(`[Input] ${this.GetName()} \u62FF\u4E0D\u5230 EnhancedInputComponent\uFF0C\u79FB\u52A8/\u89C6\u89D2\u6309\u952E\u672A\u7ED1\u5B9A`);
+      }
+      return;
     }
+    InputComponent.BindAction(JumpAction, UE4.ETriggerEvent.Started, this, "Jumpp");
+    InputComponent.BindAction(MoveAction, UE4.ETriggerEvent.Triggered, this, "Move");
+    InputComponent.BindAction(LookAction, UE4.ETriggerEvent.Triggered, this, "Look");
+    InputComponent.BindAction(LockCameraAction, UE4.ETriggerEvent.Started, this, "IA_LockCamera");
+    console.log(`[Input] ${this.GetName()} \u79FB\u52A8/\u89C6\u89D2\u6309\u952E\u5DF2\u7ED1\u5B9A(\u91CD\u8BD5${Retry}\u6B21)`);
   }
   InitAbility() {
     super.InitAbility();
@@ -493,18 +509,26 @@ var BP_PlayerController = class {
     this.BindKey();
   }
   //绑定按键
-  BindKey() {
+  //PlayerController 的输入组件也可能在 BeginPlay 时还没就绪，拿不到就重试（同 BP_Player.BindKey）
+  BindKey(Retry = 0) {
     const InputComponent = this.GetComponentByClass(UE6.EnhancedInputComponent.StaticClass());
-    if (InputComponent) {
-      InputComponent.BindAction(TestAction, UE6.ETriggerEvent.Started, this, "TestAction");
-      InputComponent.BindAction(MeleeAction, UE6.ETriggerEvent.Started, this, "Melee");
-      InputComponent.BindAction(HPRegenAction, UE6.ETriggerEvent.Started, this, "HPRegen");
-      InputComponent.BindAction(DashAction, UE6.ETriggerEvent.Started, this, "Dash");
-      InputComponent.BindAction(LaserAction, UE6.ETriggerEvent.Started, this, "Laser");
-      InputComponent.BindAction(GroundBlastAction, UE6.ETriggerEvent.Started, this, "GroundBlast");
-      InputComponent.BindAction(RightAction, UE6.ETriggerEvent.Started, this, "RightPressed");
-      InputComponent.BindAction(FireBlastAction, UE6.ETriggerEvent.Started, this, "FireBlast");
+    if (!InputComponent) {
+      if (Retry < 40) {
+        setTimeout(() => this.BindKey(Retry + 1), 50);
+      } else {
+        console.error(`[Input] ${this.GetName()} \u6280\u80FD\u952E\u672A\u7ED1\u5B9A\uFF1A\u62FF\u4E0D\u5230 EnhancedInputComponent`);
+      }
+      return;
     }
+    InputComponent.BindAction(TestAction, UE6.ETriggerEvent.Started, this, "TestAction");
+    InputComponent.BindAction(MeleeAction, UE6.ETriggerEvent.Started, this, "Melee");
+    InputComponent.BindAction(HPRegenAction, UE6.ETriggerEvent.Started, this, "HPRegen");
+    InputComponent.BindAction(DashAction, UE6.ETriggerEvent.Started, this, "Dash");
+    InputComponent.BindAction(LaserAction, UE6.ETriggerEvent.Started, this, "Laser");
+    InputComponent.BindAction(GroundBlastAction, UE6.ETriggerEvent.Started, this, "GroundBlast");
+    InputComponent.BindAction(RightAction, UE6.ETriggerEvent.Started, this, "RightPressed");
+    InputComponent.BindAction(FireBlastAction, UE6.ETriggerEvent.Started, this, "FireBlast");
+    console.log(`[Input] ${this.GetName()} \u6280\u80FD\u952E\u5DF2\u7ED1\u5B9A(\u91CD\u8BD5${Retry}\u6B21)`);
   }
   // #region Skill_Function
   TestAction() {

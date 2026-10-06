@@ -80,41 +80,62 @@ export class  BP_Player extends BP_BaseCharacter implements BP_Player {
     Move_Rotator: UE.Rotator;
 
     //添加输入映射
-    AddMappingContext(){
-        if(this.PlayerController){
-            
-            let EnhanceInputSubsystem = UE.SubsystemBlueprintLibrary.GetLocalPlayerSubSystemFromPlayerController(
+    //注意：切关/热更重启虚拟机后，PlayerController 与 EnhancedInput 子系统不一定已经就绪，
+    //原来一次拿不到就永久跳过了（表现为人物和UI都正常，但按键全都没反应），所以改成拿不到就重试
+    AddMappingContext(Retry: number = 0){
+        //每次重试都重新取一次，避免拿到旧世界残留的 PlayerController
+        this.PlayerController = UE.GameplayStatics.GetPlayerController(this,0) as BP_PlayerController;
+
+        let EnhanceInputSubsystem = this.PlayerController
+            ? UE.SubsystemBlueprintLibrary.GetLocalPlayerSubSystemFromPlayerController(
                 this.PlayerController,
                 UE.EnhancedInputLocalPlayerSubsystem.StaticClass()
-            )as UE.EnhancedInputLocalPlayerSubsystem;
-            //as 可以强制告诉let声明变量的类型
-            
-            if(EnhanceInputSubsystem&&IMC_Default){
-                EnhanceInputSubsystem.AddMappingContext(IMC_Default,0);
+            ) as UE.EnhancedInputLocalPlayerSubsystem
+            : null;
+        //as 可以强制告诉let声明变量的类型
+
+        if(!this.PlayerController || !EnhanceInputSubsystem || !IMC_Default){
+            if(Retry < 40){
+                setTimeout(()=>this.AddMappingContext(Retry + 1), 50);  //最多重试2秒
             }
-            
-            //限制相机控制的俯仰角度
-            const CameraManager = UE.GameplayStatics.GetPlayerCameraManager(this,0);
-            if(CameraManager){
-                CameraManager.ViewPitchMin = -65;
-                CameraManager.ViewPitchMax = 25;
+            else{
+                console.error(`[Input] ${this.GetName()} 输入初始化失败: PlayerController=${this.PlayerController} 子系统=${EnhanceInputSubsystem} IMC=${IMC_Default}`);
             }
-            
-            this.BindKey();
+            return;
         }
-        
+
+        EnhanceInputSubsystem.AddMappingContext(IMC_Default,0);
+        console.log(`[Input] ${this.GetName()} IMC 已注册(重试${Retry}次)`);
+
+        //限制相机控制的俯仰角度
+        const CameraManager = UE.GameplayStatics.GetPlayerCameraManager(this,0);
+        if(CameraManager){
+            CameraManager.ViewPitchMin = -65;
+            CameraManager.ViewPitchMax = 25;
+        }
+
+        this.BindKey();
     }
 
     //绑定按键
-    BindKey(){
+    //角色的 EnhancedInputComponent 是"被 Controller 附身"时才创建的，BeginPlay 时可能还不存在，同样重试
+    BindKey(Retry: number = 0){
         const InputComponent = this.GetComponentByClass(UE.EnhancedInputComponent.StaticClass()) as UE.EnhancedInputComponent;
-        if(InputComponent){
-            InputComponent.BindAction(JumpAction,UE.ETriggerEvent.Started,this,"Jumpp"); //这里的第一个函数必须是蓝图函数，或者C++蓝图可以调用的函数
-            InputComponent.BindAction(MoveAction,UE.ETriggerEvent.Triggered, this,"Move");
-            InputComponent.BindAction(LookAction,UE.ETriggerEvent.Triggered, this,"Look");
-            InputComponent.BindAction(LockCameraAction,UE.ETriggerEvent.Started, this,"IA_LockCamera");
+        if(!InputComponent){
+            if(Retry < 40){
+                setTimeout(()=>this.BindKey(Retry + 1), 50);
+            }
+            else{
+                console.error(`[Input] ${this.GetName()} 拿不到 EnhancedInputComponent，移动/视角按键未绑定`);
+            }
+            return;
         }
-        
+
+        InputComponent.BindAction(JumpAction,UE.ETriggerEvent.Started,this,"Jumpp"); //这里的第一个函数必须是蓝图函数，或者C++蓝图可以调用的函数
+        InputComponent.BindAction(MoveAction,UE.ETriggerEvent.Triggered, this,"Move");
+        InputComponent.BindAction(LookAction,UE.ETriggerEvent.Triggered, this,"Look");
+        InputComponent.BindAction(LockCameraAction,UE.ETriggerEvent.Started, this,"IA_LockCamera");
+        console.log(`[Input] ${this.GetName()} 移动/视角按键已绑定(重试${Retry}次)`);
     }
     
     protected InitAbility(){
