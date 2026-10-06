@@ -20,7 +20,7 @@ FString UHotUpdateSubsystem::GetLocalVersion() const
         //读入磁盘文件内容到JsonStr
         if (FFileHelper::LoadFileToString(JsonStr, *LocalVersionFilePath))
         {
-            FVersionInfo LocalInfo;
+            FCold_VersionInfo LocalInfo;
             //将JsonStr转换为FVersionInfo结构体
             if (FJsonObjectConverter::JsonObjectStringToUStruct(JsonStr, &LocalInfo, 0, 0))
             {
@@ -33,7 +33,7 @@ FString UHotUpdateSubsystem::GetLocalVersion() const
 
 void UHotUpdateSubsystem::SaveLocalVersion(const FString& NewVersion)
 {
-    FVersionInfo Info;
+    FCold_VersionInfo Info;
     Info.version = NewVersion;
     Info.downloadUrl = CachedRemoteInfo.downloadUrl;
     FString OutJson;
@@ -43,7 +43,7 @@ void UHotUpdateSubsystem::SaveLocalVersion(const FString& NewVersion)
 
 void UHotUpdateSubsystem::StartCheckUpdate(const FString& RemoteVersionUrl)
 {
-    UE_LOG(LogTemp, Log, TEXT("[HotUpdate] 正在向服务器请求版本信息..."));
+    UE_LOG(LogTemp, Log, TEXT("[ColdUpdate] 正在向服务器请求版本信息..."));
     TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = FHttpModule::Get().CreateRequest();
     //绑定请求完成回调函数
     Request->OnProcessRequestComplete().BindUObject(this, &UHotUpdateSubsystem::OnRemoteVersionResponse);
@@ -57,7 +57,7 @@ void UHotUpdateSubsystem::OnRemoteVersionResponse(FHttpRequestPtr Request, FHttp
 {
     if (!bWasSuccessful || !Response.IsValid() || Response->GetResponseCode() != 200)
     {
-        UE_LOG(LogTemp, Warning, TEXT("[HotUpdate] 检查版本失败，跳过热更直接进入游戏。"));
+        UE_LOG(LogTemp, Warning, TEXT("[ColdUpdate] 检查版本失败，跳过热更直接进入游戏。"));
         // 通知 UI 弹出“检查版本失败”
         OnCheckVersionResult.Broadcast(false, TEXT(""));
         return;
@@ -68,19 +68,19 @@ void UHotUpdateSubsystem::OnRemoteVersionResponse(FHttpRequestPtr Request, FHttp
     FJsonObjectConverter::JsonObjectStringToUStruct(ResponseStr, &CachedRemoteInfo, 0, 0);
 
     FString LocalVer = GetLocalVersion();
-    UE_LOG(LogTemp, Log, TEXT("[HotUpdate] 本地版本: %s | 远端版本: %s"), *LocalVer, *CachedRemoteInfo.version);
+    UE_LOG(LogTemp, Warning, TEXT("[ColdUpdate] 本地版本: %s | 远端版本: %s"), *LocalVer, *CachedRemoteInfo.version);
 
     //比较版本字符串
     if (LocalVer.Equals(CachedRemoteInfo.version))
     {
         // 版本相同，无需更新
-        UE_LOG(LogTemp, Log, TEXT("[HotUpdate] 当前已是最新版本，无需更新。"));
+        UE_LOG(LogTemp, Warning, TEXT("[ColdUpdate] 当前已是最新版本，无需更新。"));
         OnCheckVersionResult.Broadcast(false, CachedRemoteInfo.version);
     }
     else
     {
         // 版本不同，触发更新！通知 UI 弹出“发现新版本”
-        UE_LOG(LogTemp, Log, TEXT("[HotUpdate] 发现新版本，开始下载热更包..."));
+        UE_LOG(LogTemp, Warning, TEXT("[ColdUpdate] 发现新版本，开始下载热更包..."));
         OnCheckVersionResult.Broadcast(true, CachedRemoteInfo.version);
 
         FString LocalSavePath = FPaths::ProjectContentDir() / TEXT("JavaScript/bundle.js");
@@ -124,7 +124,7 @@ void UHotUpdateSubsystem::OnDownloadResponse(FHttpRequestPtr Request, FHttpRespo
         {
             // 下载成功，把远端版本号写入本地记录文件
             SaveLocalVersion(CachedRemoteInfo.version);
-            UE_LOG(LogTemp, Log, TEXT("[HotUpdate] 补丁下载成功并落盘！新版本记录已保存。"));
+            UE_LOG(LogTemp, Warning, TEXT("[ColdUpdate] 补丁下载成功并落盘！新版本记录已保存。"));
             
             // 广播更新完成事件（UI 此时可以弹窗提示：“更新完成，请点击按钮重启游戏”）
             OnUpdateFinished.Broadcast();
@@ -132,12 +132,12 @@ void UHotUpdateSubsystem::OnDownloadResponse(FHttpRequestPtr Request, FHttpRespo
         }
     }
     
-    UE_LOG(LogTemp, Error, TEXT("[HotUpdate] 热更补丁下载失败！"));
+    UE_LOG(LogTemp, Error, TEXT("[ColdUpdate] 热更补丁下载失败！"));
 }
 
 void UHotUpdateSubsystem::RestartGameApp()
 {
-    UE_LOG(LogTemp, Log, TEXT("[HotUpdate] 触发重启游戏指令..."));
+    UE_LOG(LogTemp, Warning, TEXT("[ColdUpdate] 触发重启游戏指令..."));
     
     #if WITH_EDITOR
         // 如果当前是在虚幻编辑器（PIE）中测试，为了防止编辑器崩溃，我们只做“退出游戏/停止PIE”处理

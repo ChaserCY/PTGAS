@@ -14,7 +14,7 @@
 //vision.json同款结构
 //变量名必须与JSON的键名一致
 USTRUCT()
-struct FVersionInfo
+struct FCold_VersionInfo
 {
 	GENERATED_BODY()
 	UPROPERTY()
@@ -73,7 +73,7 @@ class PTGAS_API UHotUpdateSubsystem : public UGameInstanceSubsystem
 	//保存新版本至本地文件
 	void SaveLocalVersion(const FString& NewVersion);
 	//缓存远程版本信息
-	FVersionInfo CachedRemoteInfo;
+	FCold_VersionInfo CachedRemoteInfo;
 	//本地版本文件路径
 	FString LocalVersionFilePath;
 };

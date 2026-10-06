@@ -49,6 +49,14 @@ private:
 	//脚本环境
 	TSharedPtr<puerts::FJsEnv> GameScript; 
 	
+	void StartGameScript();
+	
+public:
+	/** 暴露给热更调用的重启接口 */
+	UFUNCTION(BlueprintCallable, Category = "Puerts|HotUpdate")
+	void RestartJsEnv();
+	
+	
 };
 
 //写完后，右键--生成代码--生成定义

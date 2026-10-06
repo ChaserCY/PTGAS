@@ -1,42 +1,29 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "GameInstance/GAS_GameInstance.h"
+#include "HotUpdate/LiveJSModuleLoader.h" // 引用新建的 Loader
 
 void UGAS_GameInstance::Init()
 {
 	Super::Init();
 	
-	// 1. 获取打包后的绝对 Saved 路径并打印
-	//FString SavedDir = FPaths::ConvertRelativePathToFull(FPaths::ProjectSavedDir());
-	// 我们把热更目录直接定死在 Saved/JavaScript/
-	//FString HotPatchDir = FPaths::Combine(SavedDir, TEXT("JavaScript/"));
-	//FString TestFile = FPaths::Combine(HotPatchDir, TEXT("bundle.js"));
+	// 启动脚本虚拟机
+	StartGameScript();
+}
 
-	// 2. 强行弹窗 + 强行打印日志
-	//bool bExist = FPaths::FileExists(TestFile);
-	//FString Msg = FString::Printf(TEXT("【热更调试】检查文件: %s \n 是否存在: %s"), *TestFile, bExist ? TEXT("YES (走热更)") : TEXT("NO (走底包)"));
-	
-	// 在屏幕左上角打印红字持续 10 秒
-	//GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, Msg);
-	// 在 Log 文件里打印
-	//UE_LOG(LogTemp, Warning, TEXT("%s"), *Msg);
-
-	// 3. 决定最终给 Puerts 的根目录
-	//FString ScriptRoot = bExist ? HotPatchDir : TEXT("JavaScript");
-	
-	FString ScriptRoot = TEXT("JavaScript");
-	//DefaultJSModuleLoader，创建一个负责从指定目录加载JS模块的对象
-	auto ModuleLoader = std::make_unique<puerts::DefaultJSModuleLoader>(ScriptRoot);
-	//FDefaultLogger,Puerts默认日志器，JS端的console.log会输出到UE日志
+void UGAS_GameInstance::StartGameScript()
+{
+	// 使用新建的 FLiveJSModuleLoader：
+	// 它优先查找 Saved/HotUpdate/JavaScript/ 下的文件，找不到再回退到 Content/JavaScript/
+	auto ModuleLoader = std::make_unique<FLiveJSModuleLoader>();
 	auto Logger = std::make_shared<puerts::FDefaultLogger>();
-	
 	
 	if (bDebugMode)
 	{
 		GameScript = MakeShared<puerts::FJsEnv>(
-		std::move(ModuleLoader),
-		Logger,
-		8080
+			std::move(ModuleLoader),
+			Logger,
+			8080
 		);
 		
 		if (bWaitForDebugger)
@@ -46,16 +33,43 @@ void UGAS_GameInstance::Init()
 	}
 	else
 	{
-		GameScript = MakeShared<puerts::FJsEnv>(std::move(ModuleLoader),Logger,-1);
+		GameScript = MakeShared<puerts::FJsEnv>(
+			std::move(ModuleLoader),
+			Logger,
+			-1
+		);
 	}
 	
-	//这里这个TEXT("GameInstance")的GameInstance必须和MainGame.ts中传递的参数名一致，否则在MainGame.ts中无法通过puerts.getGlobal("GameInstance")获取到这个实例
+	// 传递 GameInstance 实例给 MainGame.ts
 	TArray<TPair<FString, UObject*>> Arguments;
-	Arguments.Add({TEXT("GameInstance"),this});
+	Arguments.Add({TEXT("GameInstance"), this});
 	
-	//启动脚本，指定入口模块为“MainGame”，并传递参数
-	GameScript->Start(TEXT("bundle"),Arguments);
-	//这里的MainGame必须是TypeScript/MainGame.ts文件的名字，否则会找不到入口模块，导致脚本无法启动
+	// 启动 bundle 入口
+	GameScript->Start(TEXT("bundle"), Arguments);
+	
+	UE_LOG(LogTemp, Warning, TEXT("[PTGAS] GameScript Started successfully with bundle.js."));
+}
+
+void UGAS_GameInstance::RestartJsEnv()
+{
+	UE_LOG(LogTemp, Warning, TEXT("[PTGAS] Restarting GameScript for Live HotUpdate..."));
+
+	// 1. 先解绑 FCall，防止旧 TS 闭包持有悬空指针
+	FCall.Unbind();
+
+	// 2. 彻底销毁并释放旧的 V8 虚拟机实例
+	if (GameScript.IsValid())
+	{
+		GameScript.Reset();
+	}
+
+	// 3. 强制进行一次引擎层完整的 GC，清空无用的原生绑定对象与原型
+	GEngine->ForceGarbageCollection(true);
+
+	// 4. 原地重建全新虚拟机，此时 ModuleLoader 会自动命中刚下载好的 Saved 热更文件，重新走一遍 bundle 和 @mixin
+	StartGameScript();
+
+	UE_LOG(LogTemp, Warning, TEXT("[PTGAS] GameScript Restart Completed!"));
 }
 
 void UGAS_GameInstance::OnStart()
@@ -67,9 +81,9 @@ void UGAS_GameInstance::Shutdown()
 {
 	Super::Shutdown();
 	
+	FCall.Unbind();
 	GameScript.Reset();
 }
-
 
 void UGAS_GameInstance::CallTS(FString FunctionName, UObject* Uobject)
 {
