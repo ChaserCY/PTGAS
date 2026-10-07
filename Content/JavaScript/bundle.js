@@ -441,6 +441,7 @@ var MeleeDamageClass = UE5.Class.Load("/Game/BluePrints/Ability/_00Melee/GE_Mele
 var GA_Melee = class {
   //当GA触发的时候执行
   K2_ActivateAbility() {
+    UE5.KismetSystemLibrary.PrintString(this, "\u51B7\u66F4\u751F\u6548", true, true, new UE5.LinearColor(1, 1, 0, 1), 10);
     this.K2_CommitAbility();
     this.BindHitEvent();
     this.PlayMeleeMontage();
