@@ -9,7 +9,13 @@ void UHotUpdateSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
     Super::Initialize(Collection);
     // 本地版本号记录文件存放在Saved/PersistentDownloadDir/ 目录下
+    // （打包后 Saved 会解析到 %LOCALAPPDATA%\<项目名>\Saved\）
     LocalVersionFilePath = FPaths::ProjectPersistentDownloadDir() / TEXT("version.json");
+
+    // 必须先把目录建出来：FFileHelper::SaveStringToFile 不会自动创建父目录，
+    // 打包版首次运行（Saved/PersistentDownloadDir 还不存在）时，版本号会静默写不进去，
+    // 表现为每次都判定“有新版本”反复下载
+    FPlatformFileManager::Get().GetPlatformFile().CreateDirectoryTree(*FPaths::ProjectPersistentDownloadDir());
 }
 
 FString UHotUpdateSubsystem::GetLocalVersion() const
@@ -83,7 +89,12 @@ void UHotUpdateSubsystem::OnRemoteVersionResponse(FHttpRequestPtr Request, FHttp
         UE_LOG(LogTemp, Warning, TEXT("[ColdUpdate] 发现新版本，开始下载热更包..."));
         OnCheckVersionResult.Broadcast(true, CachedRemoteInfo.version);
 
-        FString LocalSavePath = FPaths::ProjectContentDir() / TEXT("JavaScript/bundle.js");
+        // 落盘到沙盒可写目录，与 Live 热更完全一致：<ProjectSavedDir>/HotUpdate/JavaScript/bundle.js
+        // 打包后 ProjectSavedDir 会解析到 %LOCALAPPDATA%\<项目名>\Saved\（用户可写，装在 Program Files 下也没问题），
+        // 同时不再覆盖安装目录/工程目录里的包体版本 —— 包体那份始终是可回退的干净基线
+        FString SaveDir = FPaths::Combine(FPaths::ProjectSavedDir(), TEXT("HotUpdate/JavaScript"));
+        FPlatformFileManager::Get().GetPlatformFile().CreateDirectoryTree(*SaveDir);
+        FString LocalSavePath = FPaths::Combine(SaveDir, TEXT("bundle.js"));
         DownloadPatch(CachedRemoteInfo.downloadUrl, LocalSavePath);
     }
 }
