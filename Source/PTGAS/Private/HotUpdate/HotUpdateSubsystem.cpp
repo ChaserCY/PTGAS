@@ -10,7 +10,7 @@ void UHotUpdateSubsystem::Initialize(FSubsystemCollectionBase& Collection)
     Super::Initialize(Collection);
     // 本地版本号记录文件存放在Saved/PersistentDownloadDir/ 目录下
     // （打包后 Saved 会解析到 %LOCALAPPDATA%\<项目名>\Saved\）
-    LocalVersionFilePath = FPaths::ProjectPersistentDownloadDir() / TEXT("version.json");
+    LocalVersionFilePath = FPaths::ProjectPersistentDownloadDir() / TEXT("cold_version.json");
 
     // 必须先把目录建出来：FFileHelper::SaveStringToFile 不会自动创建父目录，
     // 打包版首次运行（Saved/PersistentDownloadDir 还不存在）时，版本号会静默写不进去，

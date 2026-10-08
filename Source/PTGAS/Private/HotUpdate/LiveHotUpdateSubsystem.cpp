@@ -14,6 +14,14 @@ void ULiveHotUpdateSubsystem::ClearHotUpdateCache()
     UE_LOG(LogTemp, Warning, TEXT("[PTGAS] 热更缓存已清空，当前仅生效包体内置逻辑"));
 }
 
+void ULiveHotUpdateSubsystem::Initialize(FSubsystemCollectionBase& Collection)
+{
+    Super::Initialize(Collection);
+    LocalVersionFilePath = FPaths::ProjectPersistentDownloadDir() / TEXT("hot_version.json");
+    FPlatformFileManager::Get().GetPlatformFile().CreateDirectoryTree(*FPaths::ProjectPersistentDownloadDir());
+    
+}
+
 void ULiveHotUpdateSubsystem::DoLiveHotUpdate(const FString& InUrl, FName InTargetMap)
 {
     // InUrl 是版本信息地址(version.json)，不是 bundle.js 本身的地址
@@ -50,7 +58,17 @@ void ULiveHotUpdateSubsystem::OnVersionFetched(FHttpRequestPtr Req, FHttpRespons
 
     UE_LOG(LogTemp, Warning, TEXT("[LiveUpdate] 远端版本: %s | 下载地址: %s"),
         *CachedRemoteInfo.version, *CachedRemoteInfo.downloadUrl);
-
+    
+    if (HasNewVersion(CachedRemoteInfo.version))
+    {
+        OnVersionChecked.Broadcast(true);
+    }
+    else
+    {
+        OnVersionChecked.Broadcast(false);
+        return;
+    }
+    
     OnLiveStatusChanged.Broadcast(FString::Printf(TEXT("发现版本 %s，正在下载 bundle.js..."), *CachedRemoteInfo.version));
 
     TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = FHttpModule::Get().CreateRequest();
@@ -58,6 +76,31 @@ void ULiveHotUpdateSubsystem::OnVersionFetched(FHttpRequestPtr Req, FHttpRespons
     Request->SetVerb(TEXT("GET"));
     Request->OnProcessRequestComplete().BindUObject(this, &ULiveHotUpdateSubsystem::OnDownloadFinished);
     Request->ProcessRequest();
+}
+
+bool ULiveHotUpdateSubsystem::HasNewVersion(const FString& NewVersion)
+{
+    const FString BundlePath = FPaths::Combine(FPaths::ProjectSavedDir(), TEXT("HotUpdate/JavaScript/bundle.js"));
+    if (!FPaths::FileExists(BundlePath)) return true;
+    FString LocalVersion;
+    if (FPlatformFileManager::Get().GetPlatformFile().FileExists(*LocalVersionFilePath))
+    {
+        FString Jsonversion;
+        if (FFileHelper::LoadFileToString(Jsonversion, *LocalVersionFilePath))
+        {
+            FHot_VersionInfo VersionInfo;
+            if (FJsonObjectConverter::JsonObjectStringToUStruct(Jsonversion, &VersionInfo, 0, 0))
+            {
+                LocalVersion = VersionInfo.version;
+            }
+        }
+        if (LocalVersion!=NewVersion)
+        {
+            return true;
+        }
+        else return false;
+    }
+    return true;
 }
 
 void ULiveHotUpdateSubsystem::OnDownloadFinished(FHttpRequestPtr Req, FHttpResponsePtr Resp, bool bSuccess)
@@ -80,6 +123,7 @@ void ULiveHotUpdateSubsystem::OnDownloadFinished(FHttpRequestPtr Req, FHttpRespo
     }
 
     OnLiveStatusChanged.Broadcast(TEXT("下载成功，切关重载虚拟机中..."));
+    SaveLocalVersion(CachedRemoteInfo.version);
     SwitchLevelAndReload();
 }
 
@@ -101,3 +145,15 @@ void ULiveHotUpdateSubsystem::SwitchLevelAndReload()
         UGameplayStatics::OpenLevel(this, TargetMap);
     }, 0.3f, false);
 }
+
+void ULiveHotUpdateSubsystem::SaveLocalVersion(const FString& NewVersion)
+{
+    FHot_VersionInfo Info;
+    Info.version = NewVersion;
+    Info.downloadUrl = CachedRemoteInfo.downloadUrl;
+    FString OutJson;
+    FJsonObjectConverter::UStructToJsonObjectString(Info, OutJson, 0, 0);
+    FFileHelper::SaveStringToFile(OutJson, *LocalVersionFilePath);
+}
+
+
