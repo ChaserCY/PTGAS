@@ -230,6 +230,9 @@ git push origin master
 
 # 推 GitHub 镜像（跳过 LFS，只推代码）
 GIT_LFS_SKIP_PUSH=1 git push github master
+
+# 从 GitHub 克隆时跳过 LFS 拉取，避免资产报错
+GIT_LFS_SKIP_SMUDGE=1 git clone <github-url>
 ```
 
 ## License
